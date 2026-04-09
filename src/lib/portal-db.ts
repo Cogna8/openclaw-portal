@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
+import { Pool } from "@neondatabase/serverless";
 
 let instance: ReturnType<typeof createClient> | undefined;
 
@@ -8,7 +9,8 @@ function createClient() {
   if (!url) throw new Error("CG8_PORTAL_DATABASE_URL is required");
   const cleanUrl = new URL(url);
   cleanUrl.searchParams.delete("channel_binding");
-  const adapter = new PrismaNeon({ connectionString: cleanUrl.toString() });
+  const pool = new Pool({ connectionString: cleanUrl.toString() });
+  const adapter = new PrismaNeon(pool);
   return new PrismaClient({ adapter });
 }
 
