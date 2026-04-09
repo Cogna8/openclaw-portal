@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("CG8_PORTAL_DATABASE_URL")
 }
 
 enum portal_role_t {
