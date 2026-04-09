@@ -4,10 +4,33 @@
 
 Push directly to main. Do not create feature branches. Do not create pull requests. Do not force-push or rewrite git history. Ensure build and tests pass before pushing.
 
+## Build
+
+```
+pnpm install
+pnpm build        # prisma generate && next build
+pnpm test         # vitest
+pnpm dev          # local dev server
+```
+
+## Repo Structure
+
+- `app/` - Next.js App Router (pages + API routes)
+- `src/lib/` - Auth, DB clients, utilities
+- `src/services/` - Business logic
+- `src/components/` - React components
+- `prisma/` - Portal DB schema
+- `tests/` - Vitest test files
+
+## Two Databases
+
+- Portal DB (`CG8_PORTAL_DATABASE_URL`): portal users, roles, sessions
+- OpenClaw Service DB (`CG8_OPENCLAW_DATABASE_URL`): accounts, API keys, usage
+
 ## Key Constraints
 
-- Two databases: portal DB (CG8_PORTAL_DATABASE_URL) + openclaw-service DB (CG8_OPENCLAW_DATABASE_URL)
-- Console design language: dark Mist theme, orange #C65A20 accent, Geist font
-- admin@cogna8.io = super_admin, irremovable
+- Console design language: dark Mist theme, orange #C65A20
+- admin@cogna8.io = super_admin, irremovable, unblockable
+- JWT sessions only (no session table)
 - Never commit secrets or .env files
 - All env vars use CG8_ prefix
