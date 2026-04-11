@@ -3,8 +3,17 @@ import Google from "next-auth/providers/google";
 import { handleSignIn } from "../services/user-provisioning";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  debug: true,
   secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
   trustHost: true,
+  logger: {
+    error(code, ...message) {
+      console.error("[NEXTAUTH_ERROR]", code, JSON.stringify(message, null, 2));
+    },
+    warn(code) {
+      console.warn("[NEXTAUTH_WARN]", code);
+    },
+  },
   providers: [
     Google({
       clientId: process.env.CG8_GOOGLE_CLIENT_ID!,
