@@ -14,28 +14,37 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: "jwt" },
   callbacks: {
     async signIn({ account, profile }) {
-      if (!profile?.email || !account?.providerAccountId) return false;
-      const result = await handleSignIn({
-        email: profile.email,
-        name: profile.name ?? null,
-        image: (profile as any).picture ?? null,
-        googleId: account.providerAccountId,
-      });
-      return result.allowed;
+      try {
+        if (!profile?.email || !account?.providerAccountId) return false;
+        const result = await handleSignIn({
+          email: profile.email,
+          name: profile.name ?? null,
+          image: (profile as any).picture ?? null,
+          googleId: account.providerAccountId,
+        });
+        return result.allowed;
+      } catch (error) {
+        console.error("[portal-auth] signIn callback error:", error);
+        throw error;
+      }
     },
     async jwt({ token, account, profile }) {
-      if (account && profile?.email) {
-        const { getPortalDb } = await import("./portal-db");
-        const db = getPortalDb();
-        const user = await db.portalUser.findUnique({
-          where: { googleId: account.providerAccountId! },
-          select: { id: true, role: true, openclawAccountId: true },
-        });
-        if (user) {
-          token.userId = user.id;
-          token.role = user.role;
-          token.openclawAccountId = user.openclawAccountId;
+      try {
+        if (account && profile?.email) {
+          const { getPortalDb } = await import("./portal-db");
+          const db = getPortalDb();
+          const user = await db.portalUser.findUnique({
+            where: { googleId: account.providerAccountId! },
+            select: { id: true, role: true, openclawAccountId: true },
+          });
+          if (user) {
+            token.userId = user.id;
+            token.role = user.role;
+            token.openclawAccountId = user.openclawAccountId;
+          }
         }
+      } catch (error) {
+        console.error("[portal-auth] jwt callback error:", error);
       }
       return token;
     },
