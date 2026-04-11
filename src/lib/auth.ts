@@ -1,8 +1,8 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
+import { handleSignIn } from "../services/user-provisioning";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  debug: true,
   secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
   trustHost: true,
   providers: [
@@ -14,17 +14,46 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: "jwt" },
   callbacks: {
     async signIn({ account, profile }) {
-      // For now, just allow sign-in without DB provisioning
-      console.log("[portal-auth] signIn called for:", profile?.email);
-      return true;
+      if (!profile?.email || !account?.providerAccountId) return false;
+      try {
+        const result = await handleSignIn({
+          email: profile.email,
+          name: profile.name ?? null,
+          image: (profile as any).picture ?? null,
+          googleId: account.providerAccountId,
+        });
+        return result.allowed;
+      } catch (error) {
+        console.error("[portal-auth] signIn error:", error);
+        return false;
+      }
     },
-    async jwt({ token, profile }) {
-      if (profile?.email) {
-        token.email = profile.email;
+    async jwt({ token, account, profile }) {
+      if (account && profile?.email) {
+        try {
+          const { getPortalDb } = await import("./portal-db");
+          const db = getPortalDb();
+          const user = await db.portalUser.findUnique({
+            where: { googleId: account.providerAccountId! },
+            select: { id: true, role: true, openclawAccountId: true },
+          });
+          if (user) {
+            token.userId = user.id;
+            token.role = user.role;
+            token.openclawAccountId = user.openclawAccountId;
+          }
+        } catch (error) {
+          console.error("[portal-auth] jwt error:", error);
+        }
       }
       return token;
     },
     async session({ session, token }) {
+      if (token) {
+        (session as any).userId = token.userId;
+        (session as any).role = token.role;
+        (session as any).openclawAccountId = token.openclawAccountId;
+      }
       return session;
     },
   },
