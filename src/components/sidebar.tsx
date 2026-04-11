@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { UserMenu } from "./user-menu";
 
@@ -14,9 +15,17 @@ export function Sidebar() {
   const pathname = usePathname();
   return (
     <aside className="flex h-screen w-64 flex-col border-r border-[oklch(var(--border))] bg-[oklch(var(--background))] p-4">
-      <div className="mb-8 px-2">
-        <h1 className="text-lg font-semibold">Cogna8</h1>
-        <p className="text-xs text-[oklch(var(--muted-foreground))]">OpenClaw Portal</p>
+      <div className="mb-8 flex items-center gap-3 px-2">
+        <Image
+          src="/openclaw-mascot.png"
+          alt="OpenClaw"
+          width={32}
+          height={38}
+        />
+        <div>
+          <h1 className="text-lg font-semibold leading-tight">Cogna8</h1>
+          <p className="text-xs text-[oklch(var(--muted-foreground))]">OpenClaw Portal</p>
+        </div>
       </div>
       <nav className="flex-1 space-y-1">
         {navItems.map((item) => (
