@@ -12,8 +12,8 @@ export default async function SignInPage() {
         <Image
           src="/openclaw-mascot.png"
           alt="OpenClaw"
-          width={120}
-          height={140}
+          width={200}
+          height={188}
           priority
         />
         <div>

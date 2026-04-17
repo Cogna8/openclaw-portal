@@ -19,8 +19,8 @@ export function Sidebar() {
         <Image
           src="/openclaw-mascot.png"
           alt="OpenClaw"
-          width={32}
-          height={38}
+          width={48}
+          height={48}
         />
         <div>
           <h1 className="text-lg font-semibold leading-tight">Cogna8</h1>
