@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "prisma:generate": "prisma generate --schema=prisma/schema.prisma && prisma generate --schema=prisma-service/schema.prisma",
+    "build": "npm run prisma:generate && next build",
     "start": "next start",
     "test": "vitest run"
   },
