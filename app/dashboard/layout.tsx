@@ -1,11 +1,22 @@
 import { Providers } from "@/components/providers";
 import { Sidebar } from "@/components/sidebar";
+import { auth } from "@/lib/auth";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const session = await auth();
+  const role = (((session as any)?.role ?? (session as any)?.user?.role ?? "user") as
+    | "user"
+    | "admin"
+    | "super_admin");
+
   return (
     <Providers>
       <div className="flex h-screen">
-        <Sidebar />
+        <Sidebar role={role} />
         <main className="flex-1 overflow-auto">{children}</main>
       </div>
     </Providers>
