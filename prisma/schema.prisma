@@ -29,3 +29,38 @@ model PortalUser {
 
   @@map("portal_users")
 }
+
+enum admin_audit_action_t {
+  user_block
+  user_unblock
+  user_role_promote
+  user_role_demote
+  account_plan_change
+  account_limits_change
+  account_status_change
+}
+
+enum admin_audit_target_t {
+  portal_user
+  openclaw_account
+}
+
+model AdminAuditLog {
+  id                String               @id @default(uuid()) @db.Uuid
+  actorPortalUserId String               @map("actor_portal_user_id") @db.Uuid
+  actorEmail        String               @map("actor_email")
+  action            admin_audit_action_t
+  targetType        admin_audit_target_t @map("target_type")
+  targetId          String               @map("target_id")
+  targetLabel       String?              @map("target_label")
+  before            Json?
+  after             Json?
+  metadata          Json?
+  createdAt         DateTime             @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([createdAt])
+  @@index([actorPortalUserId])
+  @@index([action])
+  @@index([targetType, targetId])
+  @@map("admin_audit_logs")
+}

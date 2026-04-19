@@ -1,8 +1,7 @@
 import { getPortalDb } from "../lib/portal-db";
 import { createOpenClawAccount } from "../lib/openclaw-db";
 import { generateAccountId } from "../lib/ids";
-
-const SUPER_ADMIN_EMAIL = "admin@cogna8.io";
+import { SUPER_ADMIN_EMAIL } from "../lib/constants";
 
 export async function handleSignIn(profile: {
   email: string;

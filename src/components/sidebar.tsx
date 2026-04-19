@@ -4,47 +4,60 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { UserMenu } from "./user-menu";
 
-const navItems = [
+type SidebarRole = "user" | "admin" | "super_admin";
+
+type NavItem = {
+  name: string;
+  href: string;
+  disabled: boolean;
+  roles?: SidebarRole[];
+};
+
+const navItems: NavItem[] = [
   { name: "Dashboard", href: "/dashboard", disabled: false },
   { name: "API Keys", href: "/dashboard/keys", disabled: false },
   { name: "Usage", href: "/dashboard/usage", disabled: false },
-  { name: "Setup Guide", href: "/dashboard/setup", disabled: true },
-  { name: "Settings", href: "/dashboard/settings", disabled: true },
+  { name: "Admin", href: "/dashboard/admin/users", disabled: false, roles: ["admin", "super_admin"] },
 ];
 
-export function Sidebar() {
+export function Sidebar({ role }: { role: SidebarRole }) {
   const pathname = usePathname();
+  const visible = navItems.filter((item) => !item.roles || item.roles.includes(role));
+
   return (
     <aside className="flex h-screen w-64 flex-col border-r border-[oklch(var(--border))] bg-[oklch(var(--background))] p-4">
       <div className="mb-8 flex items-center gap-3 px-2">
-        <Image
-          src="/openclaw-mascot.png"
-          alt="OpenClaw"
-          width={48}
-          height={48}
-        />
+        <Image src="/openclaw-mascot.png" alt="OpenClaw" width={48} height={48} />
         <div>
           <h1 className="text-lg font-semibold leading-tight">Cogna8</h1>
           <p className="text-xs text-[oklch(var(--muted-foreground))]">OpenClaw Portal</p>
         </div>
       </div>
+
       <nav className="flex-1 space-y-1">
-        {navItems.map((item) => (
+        {visible.map((item) => (
           <Link
             key={item.name}
             href={item.disabled ? "#" : item.href}
             className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
-              item.disabled ? "cursor-not-allowed opacity-40"
-                : pathname === item.href ? "text-[oklch(var(--primary))]"
-                : "text-[oklch(var(--muted-foreground))] hover:text-[oklch(var(--foreground))]"
+              item.disabled
+                ? "cursor-not-allowed opacity-40"
+                : pathname === item.href || pathname.startsWith(item.href + "/")
+                  ? "text-[oklch(var(--primary))]"
+                  : "text-[oklch(var(--muted-foreground))] hover:text-[oklch(var(--foreground))]"
             }`}
           >
             {item.name}
-            {item.disabled && <span className="ml-auto text-[10px] uppercase tracking-wider opacity-60">Soon</span>}
+            {item.disabled && (
+              <span className="ml-auto text-[10px] uppercase tracking-wider opacity-60">Soon</span>
+            )}
           </Link>
         ))}
       </nav>
-      <div className="mt-auto"><UserMenu /></div>
+
+      <div className="mt-auto">
+        <UserMenu />
+      </div>
     </aside>
   );
 }
