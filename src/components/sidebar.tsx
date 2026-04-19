@@ -6,7 +6,8 @@ import { UserMenu } from "./user-menu";
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard", disabled: false },
-  { name: "API Keys", href: "/dashboard/api-keys", disabled: true },
+  { name: "API Keys", href: "/dashboard/keys", disabled: false },
+  { name: "Usage", href: "/dashboard/usage", disabled: false },
   { name: "Setup Guide", href: "/dashboard/setup", disabled: true },
   { name: "Settings", href: "/dashboard/settings", disabled: true },
 ];
