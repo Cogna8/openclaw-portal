@@ -1,22 +1,16 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getToken } from "next-auth/jwt";
 
-export async function middleware(request: NextRequest) {
-  const token = await getToken({
-    req: request,
-    secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
-  });
+export function middleware(request: NextRequest) {
+  // Cookie-presence check only. Do not decode the JWT here.
+  // NextAuth v5 beta session cookies cannot be reliably decoded in edge
+  // runtime via getToken(); role gating runs in the admin layout instead.
+  const hasSession =
+    request.cookies.get("authjs.session-token")?.value ||
+    request.cookies.get("__Secure-authjs.session-token")?.value;
 
-  if (!token) {
+  if (!hasSession) {
     return NextResponse.redirect(new URL("/", request.url));
-  }
-
-  if (request.nextUrl.pathname.startsWith("/dashboard/admin")) {
-    const role = (token as any).role;
-    if (role !== "admin" && role !== "super_admin") {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
-    }
   }
 
   return NextResponse.next();
