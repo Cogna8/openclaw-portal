@@ -89,6 +89,7 @@ model Account {
   apiKeys      ApiKey[]
   usagePeriods UsagePeriod[]
   evaluations  EvaluationEvent[]
+  agents       Agent[]
 
   @@map("accounts")
 }
@@ -169,4 +170,40 @@ model EvaluationEvent {
 
   @@index([usagePeriodId])
   @@map("evaluation_events")
+}
+
+enum agent_source_t {
+  openclaw
+}
+
+enum agent_status_t {
+  active
+  archived
+}
+
+model Agent {
+  id                   String         @id @db.Uuid
+  publicId             String         @unique @map("public_id")
+  accountId            String         @map("account_id") @db.Uuid
+  source               agent_source_t
+  externalId           String         @map("external_id")
+  name                 String
+  pluginVersion        String?        @map("plugin_version")
+  agentVersion         String?        @map("agent_version")
+  apiVersion           String         @map("api_version")
+  capabilityFlags      Json           @map("capability_flags")
+  catalogHash          String         @map("catalog_hash")
+  toolsRegisteredCount Int            @map("tools_registered_count")
+  activeRulesCount     Int            @map("active_rules_count")
+  status               agent_status_t
+  firstSeenAt          DateTime       @map("first_seen_at") @db.Timestamptz
+  lastSeenAt           DateTime       @map("last_seen_at") @db.Timestamptz
+  createdAt            DateTime       @map("created_at") @db.Timestamptz
+  updatedAt            DateTime       @map("updated_at") @db.Timestamptz
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, source, externalId])
+  @@index([accountId])
+  @@map("agents")
 }
