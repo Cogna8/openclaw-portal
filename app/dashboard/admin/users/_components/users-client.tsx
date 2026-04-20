@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import RoleChangeDialog from "./role-change-dialog";
 import BlockDialog from "./block-dialog";
 import AccountEditDrawer from "./account-edit-drawer";
+import { UserRowMenu } from "./user-row-menu";
 
 type Role = "user" | "admin" | "super_admin";
 
@@ -175,36 +176,52 @@ export default function UsersClient({ viewerRole, viewerEmail }: Props) {
                         : "Never"}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <div className="flex flex-wrap justify-end gap-2">
-                        {canChangeRole && (
-                          <button
-                            onClick={() => setRoleTarget(u)}
-                            className="rounded-lg border border-zinc-700 px-3 py-1.5 text-zinc-200 hover:bg-zinc-900"
-                          >
-                            Change role
-                          </button>
-                        )}
-                        {canBlock && (
-                          <button
-                            onClick={() => setBlockTarget(u)}
-                            className={
-                              u.isBlocked
-                                ? "rounded-lg border border-emerald-800 px-3 py-1.5 text-emerald-200 hover:bg-emerald-950/40"
-                                : "rounded-lg border border-red-800 px-3 py-1.5 text-red-200 hover:bg-red-950/40"
+                      {(() => {
+                        const menuItems: Array<
+                          | {
+                              kind: "button";
+                              label: string;
+                              onClick: () => void;
+                              variant?: "default" | "danger";
                             }
-                          >
-                            {u.isBlocked ? "Unblock" : "Block"}
-                          </button>
-                        )}
-                        {u.account && (
-                          <button
-                            onClick={() => setAccountTarget(u)}
-                            className="rounded-lg border border-zinc-700 px-3 py-1.5 text-zinc-200 hover:bg-zinc-900"
-                          >
-                            Edit account
-                          </button>
-                        )}
-                      </div>
+                          | { kind: "separator" }
+                        > = [];
+
+                        if (canChangeRole) {
+                          menuItems.push({
+                            kind: "button",
+                            label: "Change role",
+                            onClick: () => setRoleTarget(u),
+                          });
+                        }
+                        if (u.account) {
+                          menuItems.push({
+                            kind: "button",
+                            label: "Edit account",
+                            onClick: () => setAccountTarget(u),
+                          });
+                        }
+                        if (canBlock) {
+                          if (menuItems.length > 0) {
+                            menuItems.push({ kind: "separator" });
+                          }
+                          menuItems.push({
+                            kind: "button",
+                            label: u.isBlocked ? "Unblock user" : "Block user",
+                            onClick: () => setBlockTarget(u),
+                            variant: u.isBlocked ? "default" : "danger",
+                          });
+                        }
+
+                        return menuItems.length > 0 ? (
+                          <UserRowMenu
+                            items={menuItems}
+                            label={`Actions for ${u.email}`}
+                          />
+                        ) : (
+                          <span className="text-zinc-600">-</span>
+                        );
+                      })()}
                     </td>
                   </tr>
                 );
@@ -251,21 +268,21 @@ function RoleBadge({ role }: { role: Role }) {
 
   const cls =
     role === "super_admin"
-      ? "rounded-full bg-[#C65A20]/20 px-2.5 py-1 text-xs text-[#F0A078]"
+      ? "inline-block whitespace-nowrap rounded-full bg-[#C65A20]/20 px-2.5 py-1 text-xs leading-none text-[#F0A078]"
       : role === "admin"
-        ? "rounded-full bg-amber-950 px-2.5 py-1 text-xs text-amber-300"
-        : "rounded-full bg-zinc-800 px-2.5 py-1 text-xs text-zinc-300";
+        ? "inline-block whitespace-nowrap rounded-full bg-amber-950 px-2.5 py-1 text-xs leading-none text-amber-300"
+        : "inline-block whitespace-nowrap rounded-full bg-zinc-800 px-2.5 py-1 text-xs leading-none text-zinc-300";
 
   return <span className={cls}>{label}</span>;
 }
 
 function StatusBadge({ blocked }: { blocked: boolean }) {
   return blocked ? (
-    <span className="rounded-full bg-red-950 px-2.5 py-1 text-xs text-red-300">
+    <span className="inline-block whitespace-nowrap rounded-full bg-red-950 px-2.5 py-1 text-xs leading-none text-red-300">
       Blocked
     </span>
   ) : (
-    <span className="rounded-full bg-emerald-950 px-2.5 py-1 text-xs text-emerald-300">
+    <span className="inline-block whitespace-nowrap rounded-full bg-emerald-950 px-2.5 py-1 text-xs leading-none text-emerald-300">
       Active
     </span>
   );
