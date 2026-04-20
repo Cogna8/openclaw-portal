@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "next dev",
     "prisma:generate": "prisma generate --schema=prisma/schema.prisma && prisma generate --schema=prisma-service/schema.prisma",
-    "build": "npm run prisma:generate && next build",
+    "prisma:migrate:deploy": "node scripts/migrate-on-deploy.mjs",
+    "build": "npm run prisma:generate && npm run prisma:migrate:deploy && next build",
     "start": "next start",
     "test": "vitest run"
   },
