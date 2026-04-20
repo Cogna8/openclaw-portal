@@ -30,22 +30,30 @@ export default function UsageClient() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function load() {
-      setLoading(true);
-      setError(null);
       try {
         const res = await fetch("/api/usage", { cache: "no-store" });
         const data = await res.json();
+        if (cancelled) return;
         if (!res.ok) throw new Error(data.error || "Failed to load usage");
         setUsage(data.usage);
+        setError(null);
       } catch (e) {
+        if (cancelled) return;
         setError(e instanceof Error ? e.message : "Failed to load usage");
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
 
     void load();
+    const interval = setInterval(load, 5000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
   }, []);
 
   const percent = useMemo(() => {
