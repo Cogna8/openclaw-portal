@@ -14,7 +14,7 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  { name: "Dashboard", href: "/dashboard", disabled: false },
+  { name: "Overview", href: "/dashboard", disabled: false },
   { name: "API Keys", href: "/dashboard/keys", disabled: false },
   { name: "Usage", href: "/dashboard/usage", disabled: false },
   { name: "Admin", href: "/dashboard/admin/users", disabled: false, roles: ["admin", "super_admin"] },
@@ -42,7 +42,9 @@ export function Sidebar({ role }: { role: SidebarRole }) {
             className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
               item.disabled
                 ? "cursor-not-allowed opacity-40"
-                : pathname === item.href || pathname.startsWith(item.href + "/")
+                : (item.href === "/dashboard"
+                    ? pathname === item.href
+                    : pathname === item.href || pathname.startsWith(item.href + "/"))
                   ? "text-[oklch(var(--primary))]"
                   : "text-[oklch(var(--muted-foreground))] hover:text-[oklch(var(--foreground))]"
             }`}
