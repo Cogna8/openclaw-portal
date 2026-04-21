@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type VariantRule = {
   public_id: string;
@@ -308,18 +308,28 @@ export default function PoliciesClient() {
   const [error, setError] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [deletingRuleId, setDeletingRuleId] = useState<string | null>(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   async function load() {
     try {
       const res = await fetch("/api/policies", { cache: "no-store" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to load policies");
+      if (!mountedRef.current) return;
       setPolicies((data as ListResponse).policies ?? []);
       setError(null);
     } catch (e) {
+      if (!mountedRef.current) return;
       setError(e instanceof Error ? e.message : "Failed to load policies");
     } finally {
-      setLoading(false);
+      if (mountedRef.current) setLoading(false);
     }
   }
 
@@ -339,9 +349,10 @@ export default function PoliciesClient() {
       if (!res.ok) throw new Error(data.error || `Failed to ${path} policy`);
       await load();
     } catch (e) {
+      if (!mountedRef.current) return;
       setError(e instanceof Error ? e.message : "Toggle failed");
     } finally {
-      setTogglingId(null);
+      if (mountedRef.current) setTogglingId(null);
     }
   }
 
@@ -356,9 +367,10 @@ export default function PoliciesClient() {
       if (!res.ok) throw new Error(data.error || "Delete failed");
       await load();
     } catch (e) {
+      if (!mountedRef.current) return;
       setError(e instanceof Error ? e.message : "Delete failed");
     } finally {
-      setDeletingRuleId(null);
+      if (mountedRef.current) setDeletingRuleId(null);
     }
   }
 
