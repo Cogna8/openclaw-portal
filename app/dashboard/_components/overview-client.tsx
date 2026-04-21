@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { RecommendedPoliciesBanner } from "@/components/recommended-policies-banner";
 
 type UsageDto = {
   limit: number;
@@ -85,6 +86,8 @@ export default function OverviewClient({ role }: { role: Role }) {
 
   return (
     <div className="space-y-6">
+      <RecommendedPoliciesBanner />
+
       {loading && !usage && (
         <div className="rounded-2xl border border-[oklch(var(--border))] bg-[oklch(var(--card))] p-6 text-[oklch(var(--muted-foreground))]">
           Loading overview...

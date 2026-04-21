@@ -17,6 +17,7 @@ const navItems: NavItem[] = [
   { name: "Overview", href: "/dashboard", disabled: false },
   { name: "API Keys", href: "/dashboard/keys", disabled: false },
   { name: "Agents", href: "/dashboard/agents", disabled: false },
+  { name: "Policies", href: "/dashboard/policies", disabled: false },
   { name: "Usage", href: "/dashboard/usage", disabled: false },
   { name: "Admin", href: "/dashboard/admin/users", disabled: false, roles: ["admin", "super_admin"] },
 ];

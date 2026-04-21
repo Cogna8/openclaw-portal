@@ -1,5 +1,6 @@
 import { getPortalDb } from "../lib/portal-db";
 import { createOpenClawAccount } from "../lib/openclaw-db";
+import { enableDefaultPoliciesForNewAccount } from "../lib/policies-bootstrap";
 import { generateAccountId } from "../lib/ids";
 import { SUPER_ADMIN_EMAIL } from "../lib/constants";
 
@@ -38,5 +39,25 @@ export async function handleSignIn(profile: {
       lastLoginAt: new Date(),
     },
   });
+
+  // Enable default policies for the new account. Best-effort — do NOT fail
+  // sign-in if the service is temporarily unreachable. The user will see
+  // the "Enable recommended policies" banner on first dashboard load if
+  // this silently falls through.
+  try {
+    const result = await enableDefaultPoliciesForNewAccount({
+      accountId: account.id,
+      userId: user.id,
+    });
+    if (result.errors.length > 0) {
+      console.warn(
+        "[user-provisioning] default-policy enablement had errors:",
+        result.errors.join("; "),
+      );
+    }
+  } catch (err) {
+    console.warn("[user-provisioning] default-policy enablement failed", err);
+  }
+
   return { userId: user.id, role: user.role, openclawAccountId: user.openclawAccountId, allowed: true };
 }

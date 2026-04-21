@@ -12,8 +12,8 @@ export async function createOpenClawAccount(publicId: string): Promise<{ id: str
   const pool = getPool();
   try {
     const result = await pool.query(
-      `INSERT INTO accounts (id, public_id, plan, status, evaluations_limit_monthly, max_agents, max_rules_per_agent, post_cap_new_rules_limit, api_version, capability_flags, created_at, updated_at)
-       VALUES (gen_random_uuid(), $1, 'free', 'active', 10000, 3, 25, 3, 'v1', '{}', NOW(), NOW())
+      `INSERT INTO accounts (id, public_id, plan, status, evaluations_limit_monthly, api_version, capability_flags, created_at, updated_at)
+       VALUES (gen_random_uuid(), $1, 'free', 'active', 10000, 'v1', '{}', NOW(), NOW())
        RETURNING id, public_id`,
       [publicId]
     );
