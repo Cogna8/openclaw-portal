@@ -14,13 +14,19 @@ function forbidden() {
   return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
     const ctx = await getCurrentAccountContext();
     const serviceDb = getServiceDb();
 
+    const statusParam = new URL(req.url).searchParams.get("status");
+    const where =
+      statusParam === "all"
+        ? { accountId: ctx.openclawAccountId }
+        : { accountId: ctx.openclawAccountId, status: "active" as const };
+
     const agents = await serviceDb.agent.findMany({
-      where: { accountId: ctx.openclawAccountId },
+      where,
       orderBy: { lastSeenAt: "desc" },
       select: {
         publicId: true,

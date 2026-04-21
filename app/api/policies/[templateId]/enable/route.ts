@@ -5,6 +5,7 @@ import {
   AccountLinkError,
 } from "@/lib/auth/session-account";
 import { enablePolicy } from "@/lib/policies-service";
+import { jsonError, normalizeProxyError } from "@/lib/http-proxy-error";
 
 export async function POST(
   _req: Request,
@@ -21,16 +22,17 @@ export async function POST(
     return NextResponse.json(result);
   } catch (error) {
     if (error instanceof AuthRequiredError) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
     if (error instanceof AccountLinkError) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
-    const status = (error as any)?.status;
-    console.error("POST /api/policies/[id]/enable failed", error);
-    return NextResponse.json(
-      { error: (error as any)?.body?.error ?? "Internal server error" },
-      { status: typeof status === "number" ? status : 500 },
-    );
+    const { status, message } = normalizeProxyError(error);
+    console.error("POST /api/policies/[id]/enable failed", {
+      status,
+      message,
+      cause: error,
+    });
+    return jsonError(message, status);
   }
 }

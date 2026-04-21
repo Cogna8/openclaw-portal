@@ -5,6 +5,7 @@ import {
   AccountLinkError,
 } from "@/lib/auth/session-account";
 import { listPolicies } from "@/lib/policies-service";
+import { jsonError, normalizeProxyError } from "@/lib/http-proxy-error";
 
 export async function GET() {
   try {
@@ -16,16 +17,13 @@ export async function GET() {
     return NextResponse.json(result);
   } catch (error) {
     if (error instanceof AuthRequiredError) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError("Unauthorized", 401);
     }
     if (error instanceof AccountLinkError) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonError("Forbidden", 403);
     }
-    const status = (error as any)?.status;
-    console.error("GET /api/policies failed", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: typeof status === "number" ? status : 500 },
-    );
+    const { status, message } = normalizeProxyError(error);
+    console.error("GET /api/policies failed", { status, message, cause: error });
+    return jsonError(message, status);
   }
 }

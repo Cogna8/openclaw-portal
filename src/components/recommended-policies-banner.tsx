@@ -36,7 +36,8 @@ export function RecommendedPoliciesBanner() {
       } else {
         setState({ kind: "visible", missing });
       }
-    } catch {
+    } catch (error) {
+      console.warn("[recommended-policies-banner] initial load failed", error);
       setState({ kind: "hidden" });
     }
   }
@@ -59,6 +60,7 @@ export function RecommendedPoliciesBanner() {
           errors.push(`${p.name}: ${body.error ?? res.statusText}`);
         }
       } catch (e) {
+        console.warn("[recommended-policies-banner] enable failed", e);
         errors.push(
           `${p.name}: ${e instanceof Error ? e.message : "network error"}`,
         );

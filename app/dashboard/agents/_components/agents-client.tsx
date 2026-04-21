@@ -103,13 +103,16 @@ export default function AgentsClient() {
   const [agents, setAgents] = useState<AgentDto[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showArchived, setShowArchived] = useState(false);
+  const [pendingPublicId, setPendingPublicId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
     async function load() {
       try {
-        const res = await fetch("/api/agents", { cache: "no-store" });
+        const query = showArchived ? "?status=all" : "?status=active";
+        const res = await fetch(`/api/agents${query}`, { cache: "no-store" });
         const data = await res.json();
         if (cancelled) return;
         if (!res.ok) throw new Error(data.error || "Failed to load agents");
@@ -123,22 +126,59 @@ export default function AgentsClient() {
       }
     }
 
+    setLoading(true);
     void load();
     const interval = setInterval(load, 5000);
     return () => {
       cancelled = true;
       clearInterval(interval);
     };
-  }, []);
+  }, [showArchived]);
+
+  async function archiveAgent(publicId: string, next: "archive" | "unarchive") {
+    setPendingPublicId(publicId);
+    try {
+      const res = await fetch(
+        `/api/agents/${encodeURIComponent(publicId)}/${next}`,
+        { method: "POST" },
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || `Failed to ${next} agent`);
+
+      const query = showArchived ? "?status=all" : "?status=active";
+      const refetch = await fetch(`/api/agents${query}`, { cache: "no-store" });
+      const refetchData = await refetch.json();
+      if (!refetch.ok) {
+        throw new Error(refetchData.error || "Failed to refresh agents");
+      }
+      setAgents(refetchData.agents ?? []);
+      setError(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : `Failed to ${next} agent`);
+    } finally {
+      setPendingPublicId(null);
+    }
+  }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-white">Agents</h1>
-        <p className="mt-1 text-sm text-zinc-400">
-          Agents registered by Cogna8 plugins installed in OpenClaw. Agents appear here
-          automatically when a plugin makes its first request.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold text-white">Agents</h1>
+          <p className="mt-1 text-sm text-zinc-400">
+            Agents registered by Cogna8 plugins installed in OpenClaw. Agents appear here
+            automatically when a plugin makes its first request.
+          </p>
+        </div>
+        <label className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-900">
+          <input
+            type="checkbox"
+            checked={showArchived}
+            onChange={(e) => setShowArchived(e.target.checked)}
+            className="h-4 w-4 cursor-pointer accent-zinc-300"
+          />
+          Show archived
+        </label>
       </div>
 
       {loading && !agents && (
@@ -155,7 +195,9 @@ export default function AgentsClient() {
 
       {agents && agents.length === 0 && (
         <div className="rounded-3xl border border-zinc-800 bg-zinc-950 p-8">
-          <div className="text-base font-medium text-white">No agents yet</div>
+          <div className="text-base font-medium text-white">
+            {showArchived ? "No agents" : "No agents yet"}
+          </div>
           <p className="mt-2 text-sm text-zinc-400">
             Install the Cogna8 OpenClaw plugin, configure it with an API key, and make a
             tool call in OpenClaw. Your agent will appear here within a few seconds.
@@ -190,13 +232,21 @@ export default function AgentsClient() {
                 <th className="px-4 py-3 text-left font-medium">Plugin</th>
                 <th className="px-4 py-3 text-left font-medium">Last seen</th>
                 <th className="px-4 py-3 text-left font-medium">Status</th>
+                <th className="px-4 py-3 text-right font-medium">
+                  <span className="sr-only">Actions</span>
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-900">
               {agents.map((a) => {
                 const recent = isRecentlyActive(a.lastSeenAt);
+                const isArchived = a.status === "archived";
+                const pending = pendingPublicId === a.publicId;
                 return (
-                  <tr key={a.publicId}>
+                  <tr
+                    key={a.publicId}
+                    className={isArchived ? "opacity-60" : undefined}
+                  >
                     <td className="px-4 py-3">
                       <div className="text-white">{a.name}</div>
                       <div className="text-xs text-zinc-500">
@@ -241,6 +291,25 @@ export default function AgentsClient() {
                           Archived
                         </span>
                       )}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          archiveAgent(
+                            a.publicId,
+                            isArchived ? "unarchive" : "archive",
+                          )
+                        }
+                        disabled={pending}
+                        className="rounded-lg border border-zinc-700 px-3 py-1 text-xs text-zinc-200 transition-colors hover:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {pending
+                          ? "..."
+                          : isArchived
+                            ? "Unarchive"
+                            : "Archive"}
+                      </button>
                     </td>
                   </tr>
                 );
