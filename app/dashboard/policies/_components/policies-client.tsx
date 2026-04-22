@@ -2,11 +2,18 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { buildVariantRows } from "@/lib/policy-variants";
+
 type VariantRule = {
   public_id: string;
   agent_public_id: string;
   tool_match: string;
   status: "active" | "disabled" | "removed";
+};
+
+type VariantDetailed = {
+  pattern: string;
+  description: string;
 };
 
 type PolicyItem = {
@@ -17,42 +24,11 @@ type PolicyItem = {
   enabled: boolean;
   enabled_at: string | null;
   variants: string[];
+  variants_detailed?: VariantDetailed[];
   rules: VariantRule[];
 };
 
 type ListResponse = { policies: PolicyItem[] };
-
-/* ───────── Helpers ───────── */
-
-type VariantRow = {
-  tool_match: string;
-  rules: VariantRule[]; // rules for this variant across all agents
-  isDefined: boolean;   // is this variant in template.variants?
-};
-
-function buildVariantRows(policy: PolicyItem): VariantRow[] {
-  const byMatch = new Map<string, VariantRule[]>();
-  for (const rule of policy.rules) {
-    if (rule.status !== "active") continue;
-    const list = byMatch.get(rule.tool_match) ?? [];
-    list.push(rule);
-    byMatch.set(rule.tool_match, list);
-  }
-
-  const rows: VariantRow[] = policy.variants.map((v) => ({
-    tool_match: v,
-    rules: byMatch.get(v) ?? [],
-    isDefined: true,
-  }));
-
-  // Any extras (shouldn't happen today but future-proof)
-  for (const [match, rules] of byMatch) {
-    if (!policy.variants.includes(match)) {
-      rows.push({ tool_match: match, rules, isDefined: false });
-    }
-  }
-  return rows;
-}
 
 function countActiveRules(policy: PolicyItem): number {
   return policy.rules.filter((r) => r.status === "active").length;
@@ -217,7 +193,8 @@ function PolicyCard({
             <button
               type="button"
               onClick={() => setExpanded((e) => !e)}
-              className="flex w-full items-center justify-between px-5 py-3 text-sm text-zinc-300 hover:bg-zinc-900"
+              className="flex w-full items-center justify-between px-5 py-3 text-sm hover:bg-zinc-900"
+              style={{ color: "oklch(var(--primary))" }}
               aria-expanded={expanded}
             >
               <span>{expanded ? "Hide" : "Show"} variant rules</span>
@@ -239,19 +216,22 @@ function PolicyCard({
               <div className="divide-y divide-zinc-900 border-t border-zinc-900">
                 {rows.map((row) => (
                   <div key={row.tool_match} className="px-5 py-3">
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
                         <code className="rounded bg-zinc-900 px-2 py-0.5 font-mono text-xs text-zinc-200">
                           {row.tool_match}
                         </code>
-                        {row.rules.length === 0 && (
-                          <span className="ml-3 text-xs text-zinc-500">
-                            No active rule (deleted — re-enable the policy to restore)
-                          </span>
+                        {row.description && (
+                          <div className="mt-1 text-xs text-zinc-500">{row.description}</div>
                         )}
-                        {row.rules.length > 0 && (
-                          <span className="ml-3 text-xs text-zinc-500">
-                            {row.rules.length} agent{row.rules.length === 1 ? "" : "s"}
+                      </div>
+
+                      <div className="shrink-0">
+                        {row.rules.length === 0 ? (
+                          <span className="text-xs text-zinc-500">No active rule</span>
+                        ) : (
+                          <span className="rounded-full border border-zinc-700 px-2 py-0.5 text-[11px] text-zinc-400">
+                            Blocked on {row.rules.length} agent{row.rules.length === 1 ? "" : "s"}
                           </span>
                         )}
                       </div>
