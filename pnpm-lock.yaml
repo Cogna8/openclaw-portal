@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@cogna8/ui':
-        specifier: git+https://github.com/Cogna8/ui.git
-        version: git+https://github.com/Cogna8/ui.git#9966e6bd3da73d2c61fa97abc7f55065d7ed716c(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(next-themes@0.4.6(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(next@15.5.15(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@3.4.19)
+        specifier: 1.0.1
+        version: 1.0.1(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(next-themes@0.4.6(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(next@15.5.15(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@3.4.19)
       '@neondatabase/serverless':
         specifier: ^1.0.0
         version: 1.1.0
@@ -117,9 +117,8 @@ packages:
       '@types/react':
         optional: true
 
-  '@cogna8/ui@git+https://github.com/Cogna8/ui.git#9966e6bd3da73d2c61fa97abc7f55065d7ed716c':
-    resolution: {commit: 9966e6bd3da73d2c61fa97abc7f55065d7ed716c, repo: https://github.com/Cogna8/ui.git, type: git}
-    version: 1.0.0
+  '@cogna8/ui@1.0.1':
+    resolution: {integrity: sha512-GAs0fCFXjNXgc/hNPFdrGlnKdiEDYOONs5kTFKKcv+UvmR+iuXKqW+owp9gW54h06vjSZXymGh6hmgPJ17preA==, tarball: https://npm.pkg.github.com/download/@cogna8/ui/1.0.1/80a502c1f806a744721331b3fb32ea4a13b5e963}
     peerDependencies:
       next: '>=15'
       next-themes: '>=0.4'
@@ -2575,7 +2574,7 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.14
 
-  '@cogna8/ui@git+https://github.com/Cogna8/ui.git#9966e6bd3da73d2c61fa97abc7f55065d7ed716c(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(next-themes@0.4.6(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(next@15.5.15(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@3.4.19)':
+  '@cogna8/ui@1.0.1(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(next-themes@0.4.6(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(next@15.5.15(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@3.4.19)':
     dependencies:
       '@base-ui-components/react': 1.0.0-rc.0(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@phosphor-icons/react': 2.1.10(react-dom@19.2.5(react@19.2.5))(react@19.2.5)

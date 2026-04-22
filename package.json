@@ -17,7 +17,7 @@
     ]
   },
   "dependencies": {
-    "@cogna8/ui": "git+https://github.com/Cogna8/ui.git",
+    "@cogna8/ui": "1.0.1",
     "@neondatabase/serverless": "^1.0.0",
     "@prisma/adapter-neon": "^6.19.0",
     "@prisma/client": "^6.19.0",
