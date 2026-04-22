@@ -17,20 +17,19 @@ export default async function LoginPage() {
         <ThemeToggle />
       </div>
       <div className="relative z-[1] w-full max-w-[560px] px-6">
-        <Card className="backdrop-blur-sm">
+        <Card className="backdrop-blur-sm shadow-lg transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl">
           <CardContent className="flex flex-col items-center gap-5 p-12 text-center">
             <Image src="/openclaw-mascot.png" alt="OpenClaw" width={140} height={132} priority />
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground text-base font-semibold">
-                C8
-              </div>
-              <span className="text-base font-semibold">Cogna8 · OpenClaw</span>
-            </div>
+            <span className="text-base font-semibold">Cogna8 · OpenClaw</span>
             <h1 className="text-[28px] font-semibold leading-tight tracking-tight">
-              Safety and Action Control for AI Agents
+              Safety and Action Control for
+              <br />
+              AI Agents
             </h1>
             <p className="max-w-[480px] text-[15px] leading-[1.65] text-muted-foreground">
-              OpenClaw is a free, open-source plugin that blocks risky actions before your agents can run them. Stop accidental and unwanted file overwrites, rogue commands, and anything else you&apos;d rather your agents not touch. Installs in two minutes.
+              OpenClaw is a free, open-source plugin that blocks risky actions. Stop accidental and unwanted file overwrites, rogue commands, and anything else you&apos;d rather your agents not touch.
+              <br />
+              Installs in two minutes.
             </p>
             <SignInButton />
             <p className="text-xs text-muted-foreground">
