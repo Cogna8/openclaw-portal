@@ -22,27 +22,15 @@ export function StartHerePanel({
   const firstName = userName?.split(" ")[0] ?? "there";
 
   return (
-    <div
-      className="mb-5 rounded-[var(--radius)] p-6"
-      style={{
-        border: "1px solid oklch(var(--primary) / 0.4)",
-        background: "oklch(var(--primary) / 0.05)",
-      }}
-    >
+    <div className="mb-5 rounded-xl border border-primary/40 bg-primary/5 p-6">
       <div className="mb-2 flex items-center gap-2">
-        <div
-          className="h-2 w-2 rounded-full"
-          style={{ background: "oklch(var(--primary))" }}
-        />
-        <span
-          className="text-[11px] font-semibold uppercase tracking-wider"
-          style={{ color: "oklch(var(--primary))" }}
-        >
+        <div className="h-2 w-2 rounded-full bg-primary" />
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-primary">
           Start here
         </span>
       </div>
 
-      <h3 className="mb-1 text-[17px] font-semibold">
+      <h3 className="mb-1 text-base font-semibold">
         Welcome{userName ? `, ${firstName}` : ""}. Let&apos;s get your first agent protected.
       </h3>
 
@@ -56,8 +44,7 @@ export function StartHerePanel({
           href="https://github.com/cogna8/openclaw"
           target="_blank"
           rel="noreferrer"
-          className="underline hover:no-underline"
-          style={{ color: "oklch(var(--primary))" }}
+          className="text-primary underline hover:no-underline"
         >
           github.com/cogna8/openclaw
         </a>
@@ -68,8 +55,7 @@ export function StartHerePanel({
         Create a key on the{" "}
         <Link
           href="/dashboard/keys"
-          className="underline hover:no-underline"
-          style={{ color: "oklch(var(--primary))" }}
+          className="text-primary underline hover:no-underline"
         >
           API Keys
         </Link>{" "}
@@ -80,15 +66,14 @@ export function StartHerePanel({
         Head to{" "}
         <Link
           href="/dashboard/policies"
-          className="underline hover:no-underline"
-          style={{ color: "oklch(var(--primary))" }}
+          className="text-primary underline hover:no-underline"
         >
           Policies
         </Link>{" "}
         and toggle on what matters. Shell, file delete, file write, and code exec are recommended.
       </Step>
 
-      <div className="border-t border-border pt-3 text-xs text-muted-foreground">
+      <div className="border-t pt-3 text-xs text-muted-foreground">
         Stuck?{" "}
         <a
           href="https://github.com/cogna8/openclaw/issues"
@@ -116,19 +101,13 @@ function Step({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex gap-3 border-t border-border py-3">
+    <div className="flex gap-3 border-t py-3">
       <div
-        className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-xs font-medium"
-        style={
-          done
-            ? {
-                background: "oklch(var(--primary))",
-                color: "oklch(var(--primary-foreground))",
-              }
-            : {
-                border: "1.5px solid oklch(var(--border))",
-                color: "oklch(var(--muted-foreground))",
-              }
+        className={
+          "mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-xs font-medium " +
+          (done
+            ? "bg-primary text-primary-foreground"
+            : "border border-border text-muted-foreground")
         }
       >
         {done ? "✓" : n}
