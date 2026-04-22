@@ -59,11 +59,9 @@ export default function OverviewClient({
 
         if (!usageRes.ok) throw new Error("Failed to load usage");
         if (!keysRes.ok) throw new Error("Failed to load keys");
-        if (!onboardingRes.ok) throw new Error("Failed to load onboarding");
 
         const usageData = await usageRes.json();
         const keysData = await keysRes.json();
-        const onboardingData = await onboardingRes.json();
 
         if (cancelled) return;
 
@@ -72,7 +70,17 @@ export default function OverviewClient({
         setTotalKeys(keys.length);
         setActiveKeys(keys.filter((k: KeyDto) => k.status === "active").length);
 
-        setOnboardingCompleted(Boolean(onboardingData.completed));
+        // Onboarding is optional - failure hides the panel, never blocks the dashboard
+        if (onboardingRes.ok) {
+          try {
+            const onboardingData = await onboardingRes.json();
+            setOnboardingCompleted(Boolean(onboardingData.completed));
+          } catch {
+            setOnboardingCompleted(true);
+          }
+        } else {
+          setOnboardingCompleted(true);
+        }
 
         setError(null);
       } catch (e) {
