@@ -26,6 +26,7 @@ model PortalUser {
   createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamptz
   updatedAt         DateTime      @updatedAt @map("updated_at") @db.Timestamptz
   lastLoginAt       DateTime?     @map("last_login_at") @db.Timestamptz
+  onboardingCompletedAt DateTime? @map("onboarding_completed_at") @db.Timestamptz
 
   @@map("portal_users")
 }

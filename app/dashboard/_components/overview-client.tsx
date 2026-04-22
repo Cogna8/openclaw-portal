@@ -40,8 +40,7 @@ export default function OverviewClient({
   const [usage, setUsage] = useState<UsageDto | null>(null);
   const [activeKeys, setActiveKeys] = useState<number | null>(null);
   const [totalKeys, setTotalKeys] = useState<number | null>(null);
-  const [agentsCount, setAgentsCount] = useState<number | null>(null);
-  const [enabledPoliciesCount, setEnabledPoliciesCount] = useState<number | null>(null);
+  const [onboardingCompleted, setOnboardingCompleted] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -50,24 +49,21 @@ export default function OverviewClient({
 
     async function load() {
       try {
-        const [usageRes, keysRes, agentsRes, policiesRes] = await Promise.all([
+        const [usageRes, keysRes, onboardingRes] = await Promise.all([
           fetch("/api/usage", { cache: "no-store" }),
           fetch("/api/keys", { cache: "no-store" }),
-          fetch("/api/agents?status=active", { cache: "no-store" }),
-          fetch("/api/policies", { cache: "no-store" }),
+          fetch("/api/onboarding", { cache: "no-store" }),
         ]);
 
         if (cancelled) return;
 
         if (!usageRes.ok) throw new Error("Failed to load usage");
         if (!keysRes.ok) throw new Error("Failed to load keys");
-        if (!agentsRes.ok) throw new Error("Failed to load agents");
-        if (!policiesRes.ok) throw new Error("Failed to load policies");
+        if (!onboardingRes.ok) throw new Error("Failed to load onboarding");
 
         const usageData = await usageRes.json();
         const keysData = await keysRes.json();
-        const agentsData = await agentsRes.json();
-        const policiesData = await policiesRes.json();
+        const onboardingData = await onboardingRes.json();
 
         if (cancelled) return;
 
@@ -76,11 +72,7 @@ export default function OverviewClient({
         setTotalKeys(keys.length);
         setActiveKeys(keys.filter((k: KeyDto) => k.status === "active").length);
 
-        const agents = Array.isArray(agentsData.agents) ? agentsData.agents : [];
-        setAgentsCount(agents.length);
-
-        const policies = Array.isArray(policiesData.policies) ? policiesData.policies : [];
-        setEnabledPoliciesCount(policies.filter((p: any) => p.enabled).length);
+        setOnboardingCompleted(Boolean(onboardingData.completed));
 
         setError(null);
       } catch (e) {
@@ -108,11 +100,9 @@ export default function OverviewClient({
 
   return (
     <div className="space-y-6">
-      <StartHerePanel
-        userName={userName}
-        agentsCount={agentsCount ?? 0}
-        enabledPoliciesCount={enabledPoliciesCount ?? 0}
-      />
+      {onboardingCompleted === false && (
+        <StartHerePanel userName={userName} />
+      )}
       <RecommendedPoliciesBanner />
 
       {loading && !usage && (
