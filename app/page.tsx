@@ -20,20 +20,20 @@ export default async function LoginPage() {
         <Card className="backdrop-blur-sm shadow-lg transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl">
           <CardContent className="flex flex-col items-center gap-5 p-12 text-center">
             <Image src="/openclaw-mascot.png" alt="OpenClaw" width={140} height={132} priority />
-            <span className="text-base font-semibold">Cogna8 · OpenClaw</span>
-            <h1 className="text-[28px] font-semibold leading-tight tracking-tight">
+            <span className="text-[13px] font-semibold">Cogna8 · OpenClaw</span>
+            <h1 className="text-[20px] font-semibold leading-tight tracking-tight">
               Safety and Action Control for
               <br />
               AI Agents
             </h1>
-            <p className="max-w-[480px] text-[15px] leading-[1.65] text-muted-foreground">
+            <p className="max-w-[480px] text-[13px] leading-[1.55] text-muted-foreground">
               OpenClaw is a free, open-source plugin that blocks risky actions. Stop accidental and unwanted file overwrites, rogue commands, and anything else you&apos;d rather your agents not touch.
             </p>
-            <p className="text-[15px] leading-[1.65] text-muted-foreground">
+            <p className="text-[13px] leading-[1.55] text-foreground font-medium">
               Installs in two minutes.
             </p>
             <SignInButton />
-            <p className="text-xs text-muted-foreground">
+            <p className="text-[11px] text-muted-foreground">
               Free · No credit card ·{" "}
               <a href="https://github.com/cogna8/openclaw" target="_blank" rel="noreferrer" className="underline hover:no-underline">
                 Read the guide on GitHub
