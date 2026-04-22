@@ -4,21 +4,9 @@ import Link from "next/link";
 
 type Props = {
   userName: string | null;
-  agentsCount: number;
-  enabledPoliciesCount: number;
 };
 
-export function StartHerePanel({
-  userName,
-  agentsCount,
-  enabledPoliciesCount,
-}: Props) {
-  const step2Done = agentsCount > 0;
-  const step3Done = enabledPoliciesCount > 0;
-  const allDone = step2Done && step3Done;
-
-  if (allDone) return null;
-
+export function StartHerePanel({ userName }: Props) {
   const firstName = userName?.split(" ")[0] ?? "there";
 
   return (
@@ -38,7 +26,7 @@ export function StartHerePanel({
         Three quick steps. Most people finish in under five minutes.
       </p>
 
-      <Step n={1} done={step2Done} title="Install the OpenClaw plugin">
+      <Step n={1} title="Install the OpenClaw plugin">
         Follow the readme on{" "}
         <a
           href="https://github.com/cogna8/openclaw"
@@ -51,7 +39,7 @@ export function StartHerePanel({
         . Works with Claude Code and any MCP-compatible agent.
       </Step>
 
-      <Step n={2} done={step2Done} title="Connect your agent with an API key">
+      <Step n={2} title="Connect your agent with an API key">
         Create a key on the{" "}
         <Link
           href="/dashboard/keys"
@@ -62,7 +50,7 @@ export function StartHerePanel({
         page, paste it into the plugin config. Your agent will show up on the Agents page within a minute.
       </Step>
 
-      <Step n={3} done={step3Done} title="Turn on the policies you want">
+      <Step n={3} title="Turn on the policies you want">
         Head to{" "}
         <Link
           href="/dashboard/policies"
@@ -91,26 +79,17 @@ export function StartHerePanel({
 
 function Step({
   n,
-  done,
   title,
   children,
 }: {
   n: number;
-  done: boolean;
   title: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="flex gap-3 border-t py-3">
-      <div
-        className={
-          "mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-xs font-medium " +
-          (done
-            ? "bg-primary text-primary-foreground"
-            : "border border-border text-muted-foreground")
-        }
-      >
-        {done ? "✓" : n}
+      <div className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-border text-xs font-medium text-muted-foreground">
+        {n}
       </div>
 
       <div className="flex-1">
