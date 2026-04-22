@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { SignInButton } from "@/components/sign-in-button";
+import { ThemeToggle } from "@/components/theme-toggle";
 import Image from "next/image";
 
 export default async function SignInPage() {
@@ -8,6 +9,9 @@ export default async function SignInPage() {
   if (session) redirect("/dashboard");
   return (
     <div className="flex min-h-screen items-center justify-center">
+      <div style={{ position: "fixed", top: 16, right: 16, zIndex: 10 }}>
+        <ThemeToggle />
+      </div>
       <div className="flex flex-col items-center gap-6 text-center">
         <Image
           src="/openclaw-mascot.png"
