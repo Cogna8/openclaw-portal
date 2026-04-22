@@ -31,3 +31,14 @@ Admin audit lives in the portal DB in admin_audit_logs. This is separate from th
 For portal DB mutations such as role changes and block / unblock, the target change and audit row are written in a single portal DB transaction.
 
 For cross-DB changes such as account plan / limits updates, the service DB change is written first and the portal audit row is written second. If the audit write fails, log it and do not roll back the service DB change.
+
+## Support (COG-143)
+
+The Support section at /dashboard/support serves help articles to signed-in portal users. It is not database-backed.
+
+- **Storage:** file-based. Articles live at `app/dashboard/support/articles/*.mdx`.
+- **Registry:** `src/lib/support/articles.ts`. Slug -> metadata (title, description, visibility, file).
+- **Role gating:** two mechanisms. (1) `getArticlesForRole(role)` filters the secondary nav so users do not see articles they cannot access. (2) `app/dashboard/support/[slug]/page.tsx` re-checks visibility server-side via `canUserSeeArticle` and redirects to `/dashboard` on mismatch. Hide in nav AND gate on the server - never one without the other.
+- **Adding a new article:** create the `.mdx` file under `app/dashboard/support/articles/`, add an entry to `articles.ts`. No DB, no migration, no deploy gating.
+- **Typography:** `mdx-components.tsx` at the repo root maps markdown elements to shadcn Typography class strings composed over canonical `@cogna8/ui` tokens. No `@tailwindcss/typography`, no `prose` classes.
+- **Future extension points (not built):** page-view analytics, article search, "was this helpful" feedback, versioned articles per plugin release.

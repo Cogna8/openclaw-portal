@@ -18,7 +18,11 @@
   },
   "dependencies": {
     "@cogna8/ui": "1.0.1",
+    "@mdx-js/loader": "^3.0.0",
+    "@mdx-js/react": "^3.0.0",
     "@neondatabase/serverless": "^1.0.0",
+    "@next/mdx": "^15.0.0",
+    "@phosphor-icons/react": "^2.1.0",
     "@prisma/adapter-neon": "^6.19.0",
     "@prisma/client": "^6.19.0",
     "@tailwindcss/postcss": "^4.2.4",
@@ -33,6 +37,7 @@
     "shadcn": "^4.4.0"
   },
   "devDependencies": {
+    "@types/mdx": "^2.0.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
