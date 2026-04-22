@@ -163,42 +163,35 @@ export default function AgentsClient() {
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-white">Agents</h1>
-          <p className="mt-1 text-sm text-zinc-400">
-            Agents registered by Cogna8 plugins installed in OpenClaw. Agents appear here
-            automatically when a plugin makes its first request.
-          </p>
-        </div>
-        <label className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-900">
+        <label className="ml-auto inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-md border bg-card px-3 py-2 text-sm hover:bg-accent">
           <input
             type="checkbox"
             checked={showArchived}
             onChange={(e) => setShowArchived(e.target.checked)}
-            className="h-4 w-4 cursor-pointer accent-zinc-300"
+            className="h-4 w-4 cursor-pointer accent-primary"
           />
           Show archived
         </label>
       </div>
 
       {loading && !agents && (
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 text-zinc-400">
+        <div className="rounded-xl border bg-card p-6 text-sm text-muted-foreground shadow-sm">
           Loading agents...
         </div>
       )}
 
       {error && (
-        <div className="rounded-2xl border border-red-900 bg-red-950/30 p-6 text-red-200">
+        <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-6 text-sm text-destructive">
           {error}
         </div>
       )}
 
       {agents && agents.length === 0 && (
-        <div className="rounded-3xl border border-zinc-800 bg-zinc-950 p-8">
-          <div className="text-base font-medium text-white">
+        <div className="rounded-xl border bg-card p-8 shadow-sm">
+          <div className="text-base font-medium">
             {showArchived ? "No agents" : "No agents yet"}
           </div>
-          <p className="mt-2 text-sm text-zinc-400">
+          <p className="mt-2 text-sm text-muted-foreground">
             Install the Cogna8 OpenClaw plugin, configure it with an API key, and make a
             tool call in OpenClaw. Your agent will appear here within a few seconds.
           </p>
@@ -207,13 +200,13 @@ export default function AgentsClient() {
               href="https://github.com/Cogna8/openclaw-plugin"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 px-3 py-1.5 text-sm text-zinc-200 hover:bg-zinc-900"
+              className="inline-flex items-center gap-2 rounded-md border bg-background px-3 py-1.5 text-sm hover:bg-accent"
             >
               Plugin on GitHub
             </a>
             <a
               href="/dashboard/keys"
-              className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 px-3 py-1.5 text-sm text-zinc-200 hover:bg-zinc-900"
+              className="inline-flex items-center gap-2 rounded-md border bg-background px-3 py-1.5 text-sm hover:bg-accent"
             >
               Get an API key
             </a>
@@ -222,9 +215,9 @@ export default function AgentsClient() {
       )}
 
       {agents && agents.length > 0 && (
-        <div className="overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-950">
-          <table className="min-w-full divide-y divide-zinc-800 text-sm">
-            <thead className="bg-zinc-900/60 text-zinc-400">
+        <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+          <table className="min-w-full divide-y divide-border text-sm">
+            <thead className="bg-muted/50 text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
                 <th className="px-4 py-3 text-left font-medium">Agent</th>
                 <th className="px-4 py-3 text-left font-medium">Public ID</th>
@@ -237,7 +230,7 @@ export default function AgentsClient() {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-900">
+            <tbody className="divide-y divide-border">
               {agents.map((a) => {
                 const recent = isRecentlyActive(a.lastSeenAt);
                 const isArchived = a.status === "archived";
@@ -248,28 +241,28 @@ export default function AgentsClient() {
                     className={isArchived ? "opacity-60" : undefined}
                   >
                     <td className="px-4 py-3">
-                      <div className="text-white">{a.name}</div>
-                      <div className="text-xs text-zinc-500">
+                      <div className="font-medium text-foreground">{a.name}</div>
+                      <div className="text-xs text-muted-foreground">
                         external_id: {a.externalId}
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <div className="inline-flex items-center font-mono text-xs text-zinc-300">
+                      <div className="inline-flex items-center font-mono text-xs text-muted-foreground">
                         {a.publicId}
                         <CopyButton value={a.publicId} />
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-zinc-300">{a.source}</td>
-                    <td className="px-4 py-3 text-zinc-400">
+                    <td className="px-4 py-3 text-muted-foreground">{a.source}</td>
+                    <td className="px-4 py-3 text-muted-foreground">
                       {a.pluginVersion ? (
                         <span className="font-mono text-xs">v{a.pluginVersion}</span>
                       ) : (
-                        <span className="text-zinc-600">-</span>
+                        <span className="text-muted-foreground/50">-</span>
                       )}
                     </td>
                     <td className="px-4 py-3">
                       <div
-                        className="text-zinc-200"
+                        className="text-foreground"
                         title={formatAbsolute(a.lastSeenAt)}
                       >
                         {formatRelative(a.lastSeenAt)}
@@ -277,17 +270,17 @@ export default function AgentsClient() {
                     </td>
                     <td className="px-4 py-3">
                       {a.status === "active" ? (
-                        <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-emerald-950 px-2.5 py-1 text-xs leading-none text-emerald-300">
+                        <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
                           {recent && (
                             <span
-                              className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400"
+                              className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500"
                               aria-hidden="true"
                             />
                           )}
                           {recent ? "Live" : "Active"}
                         </span>
                       ) : (
-                        <span className="inline-block whitespace-nowrap rounded-full bg-zinc-800 px-2.5 py-1 text-xs leading-none text-zinc-400">
+                        <span className="inline-flex items-center whitespace-nowrap rounded-full border bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground">
                           Archived
                         </span>
                       )}
@@ -302,7 +295,7 @@ export default function AgentsClient() {
                           )
                         }
                         disabled={pending}
-                        className="rounded-lg border border-zinc-700 px-3 py-1 text-xs text-zinc-200 transition-colors hover:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="rounded-md border bg-background px-3 py-1 text-xs transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         {pending
                           ? "..."

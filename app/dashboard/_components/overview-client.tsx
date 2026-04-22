@@ -116,13 +116,13 @@ export default function OverviewClient({
       <RecommendedPoliciesBanner />
 
       {loading && !usage && (
-        <div className="rounded-2xl border border-border bg-card p-6 text-muted-foreground">
+        <div className="rounded-xl border bg-card p-6 text-sm text-muted-foreground shadow-sm">
           Loading overview...
         </div>
       )}
 
       {error && (
-        <div className="rounded-2xl border border-red-900 bg-red-950/30 p-6 text-red-200">
+        <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-6 text-sm text-destructive">
           {error}
         </div>
       )}
@@ -130,16 +130,19 @@ export default function OverviewClient({
       {usage && (
         <>
           <div className="grid gap-4 md:grid-cols-3">
-            <div className="rounded-3xl border border-border bg-card p-5">
+            <div className="rounded-xl border bg-card p-6 shadow-sm">
               <div className="text-sm text-muted-foreground">
                 Evaluations this period
               </div>
-              <div className="mt-2 text-2xl font-semibold">
-                {usage.used.toLocaleString()} / {usage.limit.toLocaleString()}
+              <div className="mt-2 text-3xl font-semibold tracking-tight">
+                {usage.used.toLocaleString()}
+                <span className="ml-1 text-lg font-normal text-muted-foreground">
+                  / {usage.limit.toLocaleString()}
+                </span>
               </div>
-              <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-muted">
+              <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-muted">
                 <div
-                  className="h-full rounded-full bg-[#C65A20]"
+                  className="h-full rounded-full bg-primary transition-all"
                   style={{ width: `${percent}%` }}
                 />
               </div>
@@ -148,16 +151,23 @@ export default function OverviewClient({
               </div>
             </div>
 
-            <div className="rounded-3xl border border-border bg-card p-5">
+            <div className="rounded-xl border bg-card p-6 shadow-sm">
               <div className="text-sm text-muted-foreground">Service mode</div>
               <div className="mt-3">
                 <span
                   className={
                     usage.mode === "normal"
-                      ? "rounded-full bg-emerald-950 px-3 py-1 text-sm text-emerald-300"
-                      : "rounded-full bg-amber-950 px-3 py-1 text-sm text-amber-300"
+                      ? "inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-600 dark:text-emerald-400"
+                      : "inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-medium text-amber-600 dark:text-amber-400"
                   }
                 >
+                  <span
+                    className={
+                      usage.mode === "normal"
+                        ? "h-1.5 w-1.5 rounded-full bg-emerald-500"
+                        : "h-1.5 w-1.5 rounded-full bg-amber-500"
+                    }
+                  />
                   {usage.mode === "normal" ? "Normal" : "Degraded"}
                 </span>
               </div>
@@ -168,9 +178,9 @@ export default function OverviewClient({
               </p>
             </div>
 
-            <div className="rounded-3xl border border-border bg-card p-5">
+            <div className="rounded-xl border bg-card p-6 shadow-sm">
               <div className="text-sm text-muted-foreground">API keys</div>
-              <div className="mt-2 text-2xl font-semibold">
+              <div className="mt-2 text-3xl font-semibold tracking-tight">
                 {activeKeys ?? 0}
                 <span className="ml-2 text-sm font-normal text-muted-foreground">
                   active
@@ -189,7 +199,7 @@ export default function OverviewClient({
             <div className="grid gap-4 md:grid-cols-3">
               <Link
                 href="/dashboard/usage"
-                className="rounded-3xl border border-border bg-card p-5 transition-colors hover:border-primary"
+                className="rounded-xl border bg-card p-6 shadow-sm transition-colors hover:border-primary/40 hover:bg-accent"
               >
                 <div className="text-base font-medium">Usage</div>
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -199,7 +209,7 @@ export default function OverviewClient({
 
               <Link
                 href="/dashboard/keys"
-                className="rounded-3xl border border-border bg-card p-5 transition-colors hover:border-primary"
+                className="rounded-xl border bg-card p-6 shadow-sm transition-colors hover:border-primary/40 hover:bg-accent"
               >
                 <div className="text-base font-medium">API Keys</div>
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -210,7 +220,7 @@ export default function OverviewClient({
               {showAdmin ? (
                 <Link
                   href="/dashboard/admin/users"
-                  className="rounded-3xl border border-border bg-card p-5 transition-colors hover:border-primary"
+                  className="rounded-xl border bg-card p-6 shadow-sm transition-colors hover:border-primary/40 hover:bg-accent"
                 >
                   <div className="text-base font-medium">Admin</div>
                   <p className="mt-1 text-sm text-muted-foreground">
@@ -218,7 +228,7 @@ export default function OverviewClient({
                   </p>
                 </Link>
               ) : (
-                <div className="rounded-3xl border border-border bg-card p-5 opacity-60">
+                <div className="rounded-xl border bg-card p-6 opacity-60 shadow-sm">
                   <div className="text-base font-medium">Install the plugin</div>
                   <p className="mt-1 text-sm text-muted-foreground">
                     Setup guide coming soon. See openclaw-plugin on GitHub in the meantime.
