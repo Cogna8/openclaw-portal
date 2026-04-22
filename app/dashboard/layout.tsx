@@ -1,4 +1,3 @@
-import { Providers } from "@/components/providers";
 import { Sidebar } from "@/components/sidebar";
 import { auth } from "@/lib/auth";
 
@@ -14,11 +13,9 @@ export default async function DashboardLayout({
     | "super_admin");
 
   return (
-    <Providers>
-      <div className="flex h-screen">
-        <Sidebar role={role} />
-        <main className="flex-1 overflow-auto">{children}</main>
-      </div>
-    </Providers>
+    <div className="flex h-screen">
+      <Sidebar role={role} />
+      <main className="flex-1 overflow-auto">{children}</main>
+    </div>
   );
 }
