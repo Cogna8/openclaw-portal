@@ -28,7 +28,8 @@ export default async function LoginPage() {
             </h1>
             <p className="max-w-[480px] text-[15px] leading-[1.65] text-muted-foreground">
               OpenClaw is a free, open-source plugin that blocks risky actions. Stop accidental and unwanted file overwrites, rogue commands, and anything else you&apos;d rather your agents not touch.
-              <br />
+            </p>
+            <p className="text-[15px] leading-[1.65] text-muted-foreground">
               Installs in two minutes.
             </p>
             <SignInButton />
