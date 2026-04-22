@@ -58,6 +58,11 @@ export type PolicyVariantRule = {
   status: "active" | "disabled" | "removed";
 };
 
+export type PolicyVariantDetailed = {
+  pattern: string;
+  description: string;
+};
+
 export type PolicyListItem = {
   id: string;
   name: string;
@@ -66,6 +71,7 @@ export type PolicyListItem = {
   enabled: boolean;
   enabled_at: string | null;
   variants: string[];
+  variants_detailed?: PolicyVariantDetailed[];
   rules: PolicyVariantRule[];
 };
 
