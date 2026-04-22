@@ -46,7 +46,7 @@ export function StartHerePanel({
         Welcome{userName ? `, ${firstName}` : ""}. Let&apos;s get your first agent protected.
       </h3>
 
-      <p className="mb-3 text-sm text-[oklch(var(--muted-foreground))]">
+      <p className="mb-3 text-sm text-muted-foreground">
         Three quick steps. Most people finish in under five minutes.
       </p>
 
@@ -88,7 +88,7 @@ export function StartHerePanel({
         and toggle on what matters. Shell, file delete, file write, and code exec are recommended.
       </Step>
 
-      <div className="border-t border-[oklch(var(--border))] pt-3 text-xs text-[oklch(var(--muted-foreground))]">
+      <div className="border-t border-border pt-3 text-xs text-muted-foreground">
         Stuck?{" "}
         <a
           href="https://github.com/cogna8/openclaw/issues"
@@ -116,7 +116,7 @@ function Step({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex gap-3 border-t border-[oklch(var(--border))] py-3">
+    <div className="flex gap-3 border-t border-border py-3">
       <div
         className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-xs font-medium"
         style={
@@ -136,7 +136,7 @@ function Step({
 
       <div className="flex-1">
         <p className="mb-0.5 text-sm font-medium">{title}</p>
-        <p className="text-[13px] leading-[1.6] text-[oklch(var(--muted-foreground))]">
+        <p className="text-[13px] leading-[1.6] text-muted-foreground">
           {children}
         </p>
       </div>

@@ -1,8 +1,10 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import Image from "next/image";
 import { SignInButton } from "@/components/sign-in-button";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { HexGridBackground } from "@/components/hex-grid-background";
+import { ThemeToggle } from "@cogna8/ui/components/brand/theme-toggle";
+import { HexGridBackground } from "@cogna8/ui/components/brand/hex-grid-background";
+import { Card, CardContent } from "@cogna8/ui/components/ui/card";
 
 export default async function LoginPage() {
   const session = await auth();
@@ -11,44 +13,34 @@ export default async function LoginPage() {
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden">
       <HexGridBackground />
-
-      <div style={{ position: "fixed", top: 16, right: 16, zIndex: 10 }}>
+      <div className="fixed top-4 right-4 z-10">
         <ThemeToggle />
       </div>
-
       <div className="relative z-[1] w-full max-w-[560px] px-6">
-        <div className="rounded-[var(--radius)] border border-[oklch(var(--border))] bg-[oklch(var(--card))] p-12 text-center backdrop-blur-sm">
-          <div className="mb-4 flex items-center justify-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[oklch(var(--primary))] text-base font-semibold text-[oklch(var(--primary-foreground))]">
-              C8
+        <Card className="backdrop-blur-sm">
+          <CardContent className="flex flex-col items-center gap-5 p-12 text-center">
+            <Image src="/openclaw-mascot.png" alt="OpenClaw" width={140} height={132} priority />
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground text-base font-semibold">
+                C8
+              </div>
+              <span className="text-base font-semibold">Cogna8 · OpenClaw</span>
             </div>
-            <span className="text-base font-semibold">Cogna8 · OpenClaw</span>
-          </div>
-
-          <h1 className="mb-3 mt-2 text-[28px] font-semibold leading-tight">
-            Safety and Action Control for AI Agents
-          </h1>
-
-          <p className="mx-auto max-w-[480px] text-[15px] leading-[1.65] text-[oklch(var(--muted-foreground))]">
-            OpenClaw is a free, open-source plugin that blocks risky actions before your agents can run them. Stop accidental and unwanted file overwrites, rogue commands, and anything else you&apos;d rather your agents not touch. Installs in two minutes.
-          </p>
-
-          <div className="mt-5 flex justify-center">
+            <h1 className="text-[28px] font-semibold leading-tight tracking-tight">
+              Safety and Action Control for AI Agents
+            </h1>
+            <p className="max-w-[480px] text-[15px] leading-[1.65] text-muted-foreground">
+              OpenClaw is a free, open-source plugin that blocks risky actions before your agents can run them. Stop accidental and unwanted file overwrites, rogue commands, and anything else you&apos;d rather your agents not touch. Installs in two minutes.
+            </p>
             <SignInButton />
-          </div>
-
-          <p className="mt-3 text-xs text-[oklch(var(--muted-foreground))]">
-            Free · No credit card ·{" "}
-            <a
-              href="https://github.com/cogna8/openclaw"
-              target="_blank"
-              rel="noreferrer"
-              className="underline hover:no-underline"
-            >
-              Read the guide on GitHub
-            </a>
-          </p>
-        </div>
+            <p className="text-xs text-muted-foreground">
+              Free · No credit card ·{" "}
+              <a href="https://github.com/cogna8/openclaw" target="_blank" rel="noreferrer" className="underline hover:no-underline">
+                Read the guide on GitHub
+              </a>
+            </p>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
