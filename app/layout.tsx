@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
+import { AppProviders } from "@/components/app-providers";
 import "./globals.css";
-import { Providers } from "@/components/providers";
 
 export const metadata: Metadata = {
   title: "OpenClaw Portal - Cogna8",
@@ -34,9 +36,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="font-sans antialiased">
-        <Providers>{children}</Providers>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${GeistSans.variable} ${GeistMono.variable}`}
+      style={{
+        ["--font-sans" as any]: "var(--font-geist-sans)",
+        ["--font-mono" as any]: "var(--font-geist-mono)",
+      }}
+    >
+      <body className="antialiased">
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );

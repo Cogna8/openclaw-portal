@@ -116,7 +116,7 @@ export default function OverviewClient({
       <RecommendedPoliciesBanner />
 
       {loading && !usage && (
-        <div className="rounded-2xl border border-[oklch(var(--border))] bg-[oklch(var(--card))] p-6 text-[oklch(var(--muted-foreground))]">
+        <div className="rounded-2xl border border-border bg-card p-6 text-muted-foreground">
           Loading overview...
         </div>
       )}
@@ -130,26 +130,26 @@ export default function OverviewClient({
       {usage && (
         <>
           <div className="grid gap-4 md:grid-cols-3">
-            <div className="rounded-3xl border border-[oklch(var(--border))] bg-[oklch(var(--card))] p-5">
-              <div className="text-sm text-[oklch(var(--muted-foreground))]">
+            <div className="rounded-3xl border border-border bg-card p-5">
+              <div className="text-sm text-muted-foreground">
                 Evaluations this period
               </div>
               <div className="mt-2 text-2xl font-semibold">
                 {usage.used.toLocaleString()} / {usage.limit.toLocaleString()}
               </div>
-              <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-[oklch(var(--muted))]">
+              <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-muted">
                 <div
                   className="h-full rounded-full bg-[#C65A20]"
                   style={{ width: `${percent}%` }}
                 />
               </div>
-              <div className="mt-3 text-xs text-[oklch(var(--muted-foreground))]">
+              <div className="mt-3 text-xs text-muted-foreground">
                 {formatPeriod(usage.periodStart, usage.periodEnd)}
               </div>
             </div>
 
-            <div className="rounded-3xl border border-[oklch(var(--border))] bg-[oklch(var(--card))] p-5">
-              <div className="text-sm text-[oklch(var(--muted-foreground))]">Service mode</div>
+            <div className="rounded-3xl border border-border bg-card p-5">
+              <div className="text-sm text-muted-foreground">Service mode</div>
               <div className="mt-3">
                 <span
                   className={
@@ -161,48 +161,48 @@ export default function OverviewClient({
                   {usage.mode === "normal" ? "Normal" : "Degraded"}
                 </span>
               </div>
-              <p className="mt-3 text-xs text-[oklch(var(--muted-foreground))]">
+              <p className="mt-3 text-xs text-muted-foreground">
                 {usage.mode === "normal"
                   ? "Evaluations are fully available within your monthly limit."
                   : "Service is protecting capacity after the current period limit was reached."}
               </p>
             </div>
 
-            <div className="rounded-3xl border border-[oklch(var(--border))] bg-[oklch(var(--card))] p-5">
-              <div className="text-sm text-[oklch(var(--muted-foreground))]">API keys</div>
+            <div className="rounded-3xl border border-border bg-card p-5">
+              <div className="text-sm text-muted-foreground">API keys</div>
               <div className="mt-2 text-2xl font-semibold">
                 {activeKeys ?? 0}
-                <span className="ml-2 text-sm font-normal text-[oklch(var(--muted-foreground))]">
+                <span className="ml-2 text-sm font-normal text-muted-foreground">
                   active
                 </span>
               </div>
-              <div className="mt-3 text-xs text-[oklch(var(--muted-foreground))]">
+              <div className="mt-3 text-xs text-muted-foreground">
                 {totalKeys ?? 0} total {(totalKeys ?? 0) === 1 ? "key" : "keys"} on this account
               </div>
             </div>
           </div>
 
           <div>
-            <h3 className="mb-3 text-sm font-medium text-[oklch(var(--muted-foreground))]">
+            <h3 className="mb-3 text-sm font-medium text-muted-foreground">
               Jump to
             </h3>
             <div className="grid gap-4 md:grid-cols-3">
               <Link
                 href="/dashboard/usage"
-                className="rounded-3xl border border-[oklch(var(--border))] bg-[oklch(var(--card))] p-5 transition-colors hover:border-[oklch(var(--primary))]"
+                className="rounded-3xl border border-border bg-card p-5 transition-colors hover:border-primary"
               >
                 <div className="text-base font-medium">Usage</div>
-                <p className="mt-1 text-sm text-[oklch(var(--muted-foreground))]">
+                <p className="mt-1 text-sm text-muted-foreground">
                   See detailed evaluation counts and current billing period.
                 </p>
               </Link>
 
               <Link
                 href="/dashboard/keys"
-                className="rounded-3xl border border-[oklch(var(--border))] bg-[oklch(var(--card))] p-5 transition-colors hover:border-[oklch(var(--primary))]"
+                className="rounded-3xl border border-border bg-card p-5 transition-colors hover:border-primary"
               >
                 <div className="text-base font-medium">API Keys</div>
-                <p className="mt-1 text-sm text-[oklch(var(--muted-foreground))]">
+                <p className="mt-1 text-sm text-muted-foreground">
                   Create, label, and revoke keys used by your OpenClaw plugin.
                 </p>
               </Link>
@@ -210,17 +210,17 @@ export default function OverviewClient({
               {showAdmin ? (
                 <Link
                   href="/dashboard/admin/users"
-                  className="rounded-3xl border border-[oklch(var(--border))] bg-[oklch(var(--card))] p-5 transition-colors hover:border-[oklch(var(--primary))]"
+                  className="rounded-3xl border border-border bg-card p-5 transition-colors hover:border-primary"
                 >
                   <div className="text-base font-medium">Admin</div>
-                  <p className="mt-1 text-sm text-[oklch(var(--muted-foreground))]">
+                  <p className="mt-1 text-sm text-muted-foreground">
                     Manage users, plans, and view audit logs.
                   </p>
                 </Link>
               ) : (
-                <div className="rounded-3xl border border-[oklch(var(--border))] bg-[oklch(var(--card))] p-5 opacity-60">
+                <div className="rounded-3xl border border-border bg-card p-5 opacity-60">
                   <div className="text-base font-medium">Install the plugin</div>
-                  <p className="mt-1 text-sm text-[oklch(var(--muted-foreground))]">
+                  <p className="mt-1 text-sm text-muted-foreground">
                     Setup guide coming soon. See openclaw-plugin on GitHub in the meantime.
                   </p>
                 </div>
