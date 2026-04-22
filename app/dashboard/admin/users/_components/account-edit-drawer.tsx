@@ -77,29 +77,29 @@ export default function AccountEditDrawer({ user, onClose, onSaved }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-black/70">
-      <div className="flex h-full w-full max-w-lg flex-col border-l border-zinc-800 bg-zinc-950 p-6 shadow-2xl">
+      <div className="flex h-full w-full max-w-lg flex-col border-l border-border bg-card p-6 shadow-2xl">
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-white">Edit account</h2>
-            <p className="mt-1 text-sm text-zinc-400">
+            <h2 className="text-lg font-semibold text-foreground">Edit account</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
               {account.publicId} (owner {user.email})
             </p>
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg border border-zinc-700 px-3 py-1.5 text-sm text-zinc-200"
+            className="rounded-lg border border-border px-3 py-1.5 text-sm text-foreground"
           >
             Close
           </button>
         </div>
 
         <div className="mt-6 space-y-6 overflow-y-auto">
-          <section className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4">
-            <h3 className="text-sm font-semibold text-white">Plan</h3>
+          <section className="rounded-xl border border-border bg-muted/40 p-4">
+            <h3 className="text-sm font-semibold text-foreground">Plan</h3>
             <select
               value={plan}
               onChange={(e) => setPlan(e.target.value as Plan)}
-              className="mt-3 w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white outline-none focus:border-zinc-600"
+              className="mt-3 w-full rounded-xl border border-border bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-border"
             >
               <option value="free">Free</option>
               <option value="paid">Paid</option>
@@ -109,46 +109,46 @@ export default function AccountEditDrawer({ user, onClose, onSaved }: Props) {
               <button
                 onClick={() => void savePlan()}
                 disabled={savingPlan || plan === account.plan}
-                className="rounded-xl bg-[#C65A20] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-foreground disabled:opacity-50"
               >
                 {savingPlan ? "Saving..." : "Save plan"}
               </button>
             </div>
           </section>
 
-          <section className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4">
-            <h3 className="text-sm font-semibold text-white">Limits</h3>
+          <section className="rounded-xl border border-border bg-muted/40 p-4">
+            <h3 className="text-sm font-semibold text-foreground">Limits</h3>
 
-            <label className="mt-3 block text-xs text-zinc-400">
+            <label className="mt-3 block text-xs text-muted-foreground">
               Evaluations per month
               <input
                 type="number"
                 min={1}
                 value={evals}
                 onChange={(e) => setEvals(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white outline-none focus:border-zinc-600"
+                className="mt-1 w-full rounded-xl border border-border bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-border"
               />
             </label>
 
-            <label className="mt-3 block text-xs text-zinc-400">
+            <label className="mt-3 block text-xs text-muted-foreground">
               Max agents
               <input
                 type="number"
                 min={1}
                 value={maxAgents}
                 onChange={(e) => setMaxAgents(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white outline-none focus:border-zinc-600"
+                className="mt-1 w-full rounded-xl border border-border bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-border"
               />
             </label>
 
-            <label className="mt-3 block text-xs text-zinc-400">
+            <label className="mt-3 block text-xs text-muted-foreground">
               Max rules per agent
               <input
                 type="number"
                 min={1}
                 value={maxRules}
                 onChange={(e) => setMaxRules(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white outline-none focus:border-zinc-600"
+                className="mt-1 w-full rounded-xl border border-border bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-border"
               />
             </label>
 
@@ -156,14 +156,14 @@ export default function AccountEditDrawer({ user, onClose, onSaved }: Props) {
               <button
                 onClick={() => void saveLimits()}
                 disabled={savingLimits}
-                className="rounded-xl bg-[#C65A20] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-foreground disabled:opacity-50"
               >
                 {savingLimits ? "Saving..." : "Save limits"}
               </button>
             </div>
           </section>
 
-          {error && <div className="text-sm text-red-300">{error}</div>}
+          {error && <div className="text-sm text-destructive">{error}</div>}
         </div>
       </div>
     </div>

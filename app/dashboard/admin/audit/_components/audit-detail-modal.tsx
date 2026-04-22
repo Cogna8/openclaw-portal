@@ -23,17 +23,17 @@ export default function AuditDetailModal({ row, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-      <div className="w-full max-w-2xl rounded-3xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl">
+      <div className="w-full max-w-2xl rounded-xl border border-border bg-card p-6 shadow-2xl">
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-white">{row.action}</h2>
-            <p className="mt-1 text-sm text-zinc-400">
+            <h2 className="text-lg font-semibold text-foreground">{row.action}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
               {new Date(row.createdAt).toLocaleString()} by {row.actorEmail}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg border border-zinc-700 px-3 py-1.5 text-sm text-zinc-200"
+            className="rounded-lg border border-border px-3 py-1.5 text-sm text-foreground"
           >
             Close
           </button>
@@ -55,8 +55,8 @@ export default function AuditDetailModal({ row, onClose }: Props) {
 function Pair({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <div className="text-xs uppercase tracking-wider text-zinc-500">{label}</div>
-      <div className="mt-1 text-white">{value}</div>
+      <div className="text-xs uppercase tracking-wider text-muted-foreground/70">{label}</div>
+      <div className="mt-1 text-foreground">{value}</div>
     </div>
   );
 }
@@ -64,8 +64,8 @@ function Pair({ label, value }: { label: string; value: string }) {
 function Block({ label, json }: { label: string; json: unknown }) {
   return (
     <div>
-      <div className="text-xs uppercase tracking-wider text-zinc-500">{label}</div>
-      <pre className="mt-1 overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-900 p-3 font-mono text-xs text-zinc-200">
+      <div className="text-xs uppercase tracking-wider text-muted-foreground/70">{label}</div>
+      <pre className="mt-1 overflow-x-auto rounded-xl border border-border bg-muted p-3 font-mono text-xs text-foreground">
         {JSON.stringify(json ?? null, null, 2)}
       </pre>
     </div>

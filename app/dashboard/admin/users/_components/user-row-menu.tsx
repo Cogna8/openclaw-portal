@@ -125,11 +125,11 @@ export function UserRowMenu({ items, label }: { items: MenuItem[]; label?: strin
           width: MENU_WIDTH,
           zIndex: 50,
         }}
-        className="rounded-lg border border-zinc-800 bg-zinc-950 p-1 shadow-xl"
+        className="rounded-lg border border-border bg-card p-1 shadow-xl"
       >
         {items.map((item, i) => {
           if (item.kind === "separator") {
-            return <div key={`sep-${i}`} className="my-1 h-px bg-zinc-800" />;
+            return <div key={`sep-${i}`} className="my-1 h-px bg-muted" />;
           }
           const isDanger = item.variant === "danger";
           return (
@@ -143,8 +143,8 @@ export function UserRowMenu({ items, label }: { items: MenuItem[]; label?: strin
               }}
               className={`block w-full rounded-md px-3 py-1.5 text-left text-sm transition-colors ${
                 isDanger
-                  ? "text-red-300 hover:bg-red-950/40"
-                  : "text-zinc-200 hover:bg-zinc-900"
+                  ? "text-destructive hover:bg-destructive/10"
+                  : "text-foreground hover:bg-muted"
               }`}
             >
               {item.label}
@@ -163,7 +163,7 @@ export function UserRowMenu({ items, label }: { items: MenuItem[]; label?: strin
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={label ?? "Actions"}
-        className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-zinc-800 text-zinc-400 transition-colors hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-700"
+        className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:border-border hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
       >
         <svg
           width="14"

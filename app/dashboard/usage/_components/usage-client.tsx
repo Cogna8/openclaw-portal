@@ -64,19 +64,19 @@ export default function UsageClient() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-white">Usage</h1>
-        <p className="mt-1 text-sm text-zinc-400">
+        <h1 className="text-2xl font-semibold text-foreground">Usage</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           Track your monthly evaluation usage and current service mode.
         </p>
       </div>
 
       {loading && (
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 text-zinc-400">
+        <div className="rounded-xl border border-border bg-card p-6 text-muted-foreground">
           Loading usage...
         </div>
       )}
       {error && (
-        <div className="rounded-2xl border border-red-900 bg-red-950/30 p-6 text-red-200">
+        <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-6 text-sm text-destructive">
           {error}
         </div>
       )}
@@ -84,27 +84,27 @@ export default function UsageClient() {
       {!loading && !error && usage && (
         <>
           <div className="grid gap-4 md:grid-cols-3">
-            <div className="rounded-3xl border border-zinc-800 bg-zinc-950 p-5">
-              <div className="text-sm text-zinc-400">Evaluations this period</div>
-              <div className="mt-2 text-2xl font-semibold text-white">
+            <div className="rounded-xl border border-border bg-card p-5">
+              <div className="text-sm text-muted-foreground">Evaluations this period</div>
+              <div className="mt-2 text-2xl font-semibold text-foreground">
                 {usage.used.toLocaleString()} / {usage.limit.toLocaleString()}
               </div>
-              <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-zinc-900">
+              <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-muted">
                 <div
-                  className="h-full rounded-full bg-[#C65A20]"
+                  className="h-full rounded-full bg-primary"
                   style={{ width: `${percent}%` }}
                 />
               </div>
             </div>
 
-            <div className="rounded-3xl border border-zinc-800 bg-zinc-950 p-5">
-              <div className="text-sm text-zinc-400">Current mode</div>
+            <div className="rounded-xl border border-border bg-card p-5">
+              <div className="text-sm text-muted-foreground">Current mode</div>
               <div className="mt-3">
                 <span
                   className={
                     usage.mode === "normal"
-                      ? "rounded-full bg-emerald-950 px-3 py-1 text-sm text-emerald-300"
-                      : "rounded-full bg-amber-950 px-3 py-1 text-sm text-amber-300"
+                      ? "inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-sm font-medium text-emerald-700 dark:text-emerald-400"
+                      : "inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-sm font-medium text-amber-700 dark:text-amber-400"
                   }
                 >
                   {usage.mode === "normal" ? "Normal" : "Degraded"}
@@ -112,15 +112,15 @@ export default function UsageClient() {
               </div>
             </div>
 
-            <div className="rounded-3xl border border-zinc-800 bg-zinc-950 p-5">
-              <div className="text-sm text-zinc-400">Period</div>
-              <div className="mt-2 text-lg font-medium text-white">
+            <div className="rounded-xl border border-border bg-card p-5">
+              <div className="text-sm text-muted-foreground">Period</div>
+              <div className="mt-2 text-lg font-medium text-foreground">
                 {formatPeriod(usage.periodStart, usage.periodEnd)}
               </div>
             </div>
           </div>
 
-          <div className="rounded-3xl border border-zinc-800 bg-zinc-950 p-6 text-sm leading-6 text-zinc-300">
+          <div className="rounded-xl border border-border bg-card p-6 text-sm leading-6 text-foreground">
             <p>
               Normal mode means evaluations are fully available within your current monthly
               limit.

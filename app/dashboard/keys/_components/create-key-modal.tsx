@@ -57,35 +57,35 @@ export default function CreateKeyModal({ open, onClose, onCreated }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-      <div className="w-full max-w-lg rounded-3xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl">
+      <div className="w-full max-w-lg rounded-xl border border-border bg-card p-6 shadow-2xl">
         {!rawKey ? (
           <>
-            <h2 className="text-lg font-semibold text-white">Generate key</h2>
-            <p className="mt-1 text-sm text-zinc-400">
+            <h2 className="text-lg font-semibold text-foreground">Generate key</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
               Give this key a label so you can recognize it later.
             </p>
-            <label className="mt-4 block text-sm text-zinc-300">
+            <label className="mt-4 block text-sm text-foreground">
               Label
               <input
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
                 maxLength={50}
-                className="mt-2 w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-white outline-none focus:border-zinc-600"
+                className="mt-2 w-full rounded-xl border border-border bg-muted px-3 py-2 text-foreground outline-none focus:border-border"
                 placeholder="Production laptop"
               />
             </label>
-            {error && <div className="mt-3 text-sm text-red-300">{error}</div>}
+            {error && <div className="mt-3 text-sm text-destructive">{error}</div>}
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={onClose}
-                className="rounded-xl border border-zinc-700 px-4 py-2 text-sm text-zinc-200"
+                className="rounded-xl border border-border px-4 py-2 text-sm text-foreground"
               >
                 Cancel
               </button>
               <button
                 onClick={() => void submit()}
                 disabled={loading || !label.trim()}
-                className="rounded-xl bg-[#C65A20] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-foreground disabled:opacity-50"
               >
                 {loading ? "Generating..." : "Generate key"}
               </button>
@@ -93,23 +93,23 @@ export default function CreateKeyModal({ open, onClose, onCreated }: Props) {
           </>
         ) : (
           <>
-            <h2 className="text-lg font-semibold text-white">Copy your key now</h2>
-            <p className="mt-1 text-sm text-amber-300">
+            <h2 className="text-lg font-semibold text-foreground">Copy your key now</h2>
+            <p className="mt-1 text-sm text-amber-700 dark:text-amber-400">
               This key will not be shown again. Copy it now.
             </p>
-            <div className="mt-4 rounded-2xl border border-zinc-800 bg-zinc-900 p-4 font-mono text-sm text-white break-all">
+            <div className="mt-4 rounded-xl border border-border bg-muted p-4 font-mono text-sm text-foreground break-all">
               {rawKey}
             </div>
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => void copy()}
-                className="rounded-xl border border-zinc-700 px-4 py-2 text-sm text-zinc-200"
+                className="rounded-xl border border-border px-4 py-2 text-sm text-foreground"
               >
                 Copy key
               </button>
               <button
                 onClick={closeAndClear}
-                className="rounded-xl bg-[#C65A20] px-4 py-2 text-sm font-semibold text-white"
+                className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-foreground"
               >
                 Done
               </button>

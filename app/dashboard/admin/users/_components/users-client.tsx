@@ -77,8 +77,8 @@ export default function UsersClient({ viewerRole, viewerEmail }: Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-white">User management</h1>
-        <p className="mt-1 text-sm text-zinc-400">
+        <h1 className="text-2xl font-semibold text-foreground">User management</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           Manage portal users, their roles, and linked OpenClaw accounts.
         </p>
       </div>
@@ -88,12 +88,12 @@ export default function UsersClient({ viewerRole, viewerEmail }: Props) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by email or name"
-          className="w-64 rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white outline-none focus:border-zinc-600"
+          className="w-64 rounded-xl border border-border bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-border"
         />
         <select
           value={roleFilter}
           onChange={(e) => setRoleFilter(e.target.value)}
-          className="rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white outline-none focus:border-zinc-600"
+          className="rounded-xl border border-border bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-border"
         >
           <option value="">All roles</option>
           <option value="user">User</option>
@@ -103,7 +103,7 @@ export default function UsersClient({ viewerRole, viewerEmail }: Props) {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white outline-none focus:border-zinc-600"
+          className="rounded-xl border border-border bg-muted px-3 py-2 text-sm text-foreground outline-none focus:border-border"
         >
           <option value="">All statuses</option>
           <option value="active">Active</option>
@@ -112,20 +112,20 @@ export default function UsersClient({ viewerRole, viewerEmail }: Props) {
       </div>
 
       {loading && (
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 text-zinc-400">
+        <div className="rounded-xl border border-border bg-card p-6 text-muted-foreground">
           Loading users...
         </div>
       )}
       {error && (
-        <div className="rounded-2xl border border-red-900 bg-red-950/30 p-6 text-red-200">
+        <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-6 text-sm text-destructive">
           {error}
         </div>
       )}
 
       {!loading && !error && (
-        <div className="overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-950">
-          <table className="min-w-full divide-y divide-zinc-800 text-sm">
-            <thead className="bg-zinc-900/60 text-zinc-400">
+        <div className="overflow-hidden rounded-xl border border-border bg-card">
+          <table className="min-w-full divide-y divide-border text-sm">
+            <thead className="bg-muted/50 text-muted-foreground">
               <tr>
                 <th className="px-4 py-3 text-left font-medium">User</th>
                 <th className="px-4 py-3 text-left font-medium">Role</th>
@@ -135,7 +135,7 @@ export default function UsersClient({ viewerRole, viewerEmail }: Props) {
                 <th className="px-4 py-3 text-right font-medium">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-900">
+            <tbody className="divide-y divide-border">
               {users.map((u) => {
                 const isSelf = u.email === viewerEmail;
                 const isProtectedTarget =
@@ -149,8 +149,8 @@ export default function UsersClient({ viewerRole, viewerEmail }: Props) {
                 return (
                   <tr key={u.id}>
                     <td className="px-4 py-3">
-                      <div className="text-white">{u.name || u.email}</div>
-                      <div className="text-xs text-zinc-500">{u.email}</div>
+                      <div className="text-foreground">{u.name || u.email}</div>
+                      <div className="text-xs text-muted-foreground/70">{u.email}</div>
                     </td>
                     <td className="px-4 py-3">
                       <RoleBadge role={u.role} />
@@ -160,17 +160,17 @@ export default function UsersClient({ viewerRole, viewerEmail }: Props) {
                     </td>
                     <td className="px-4 py-3">
                       {u.account ? (
-                        <div className="text-zinc-200">
+                        <div className="text-foreground">
                           <div>{u.account.publicId}</div>
-                          <div className="text-xs text-zinc-500">
+                          <div className="text-xs text-muted-foreground/70">
                             {u.account.plan} / {u.account.status}
                           </div>
                         </div>
                       ) : (
-                        <span className="text-zinc-600">-</span>
+                        <span className="text-muted-foreground/50">-</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-zinc-400">
+                    <td className="px-4 py-3 text-muted-foreground">
                       {u.lastLoginAt
                         ? new Date(u.lastLoginAt).toLocaleString()
                         : "Never"}
@@ -219,7 +219,7 @@ export default function UsersClient({ viewerRole, viewerEmail }: Props) {
                             label={`Actions for ${u.email}`}
                           />
                         ) : (
-                          <span className="text-zinc-600">-</span>
+                          <span className="text-muted-foreground/50">-</span>
                         );
                       })()}
                     </td>
@@ -228,7 +228,7 @@ export default function UsersClient({ viewerRole, viewerEmail }: Props) {
               })}
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-10 text-center text-zinc-500">
+                  <td colSpan={6} className="px-4 py-10 text-center text-muted-foreground/70">
                     No users match these filters.
                   </td>
                 </tr>
@@ -268,21 +268,21 @@ function RoleBadge({ role }: { role: Role }) {
 
   const cls =
     role === "super_admin"
-      ? "inline-block whitespace-nowrap rounded-full bg-[#C65A20]/20 px-2.5 py-1 text-xs leading-none text-[#F0A078]"
+      ? "inline-block whitespace-nowrap rounded-full bg-primary/20 px-2.5 py-1 text-xs leading-none text-primary"
       : role === "admin"
-        ? "inline-block whitespace-nowrap rounded-full bg-amber-950 px-2.5 py-1 text-xs leading-none text-amber-300"
-        : "inline-block whitespace-nowrap rounded-full bg-zinc-800 px-2.5 py-1 text-xs leading-none text-zinc-300";
+        ? "inline-flex items-center rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-medium text-amber-700 dark:text-amber-400"
+        : "inline-block whitespace-nowrap rounded-full bg-muted px-2.5 py-1 text-xs leading-none text-foreground";
 
   return <span className={cls}>{label}</span>;
 }
 
 function StatusBadge({ blocked }: { blocked: boolean }) {
   return blocked ? (
-    <span className="inline-block whitespace-nowrap rounded-full bg-red-950 px-2.5 py-1 text-xs leading-none text-red-300">
+    <span className="inline-flex items-center rounded-full border border-destructive/30 bg-destructive/10 px-2.5 py-1 text-xs font-medium text-destructive">
       Blocked
     </span>
   ) : (
-    <span className="inline-block whitespace-nowrap rounded-full bg-emerald-950 px-2.5 py-1 text-xs leading-none text-emerald-300">
+    <span className="inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-400">
       Active
     </span>
   );

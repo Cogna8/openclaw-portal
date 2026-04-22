@@ -55,8 +55,8 @@ function Toggle({
       aria-label={ariaLabel}
       disabled={disabled}
       onClick={() => onChange(!checked)}
-      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 focus-visible:ring-zinc-500 disabled:cursor-not-allowed disabled:opacity-60 ${
-        checked ? "bg-emerald-600" : "bg-zinc-700"
+      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60 ${
+        checked ? "bg-emerald-600" : "bg-muted"
       }`}
     >
       <span
@@ -92,15 +92,15 @@ function ConfirmModal({
       role="dialog"
       aria-modal="true"
     >
-      <div className="w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-xl">
-        <h2 className="text-lg font-semibold text-zinc-100">{title}</h2>
-        <p className="mt-2 text-sm text-zinc-400">{description}</p>
+      <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 shadow-xl">
+        <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+        <p className="mt-2 text-sm text-muted-foreground">{description}</p>
         <div className="mt-6 flex justify-end gap-3">
           <button
             type="button"
             onClick={onCancel}
             disabled={busy}
-            className="rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-200 hover:bg-zinc-900 disabled:opacity-50"
+            className="rounded-lg border border-border px-4 py-2 text-sm text-foreground hover:bg-muted disabled:opacity-50"
           >
             Cancel
           </button>
@@ -108,7 +108,7 @@ function ConfirmModal({
             type="button"
             onClick={onConfirm}
             disabled={busy}
-            className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-500 disabled:opacity-50"
+            className="rounded-lg bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50"
           >
             {busy ? "Working..." : confirmLabel}
           </button>
@@ -153,24 +153,24 @@ function PolicyCard({
 
   return (
     <>
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-950">
+      <div className="rounded-xl border border-border bg-card">
         <div className="flex items-start gap-4 p-5">
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <h3 className="text-base font-semibold text-zinc-100">{policy.name}</h3>
+              <h3 className="text-base font-semibold text-foreground">{policy.name}</h3>
               {policy.default_enabled && (
-                <span className="rounded-full border border-zinc-700 px-2 py-0.5 text-[10px] uppercase tracking-wider text-zinc-400">
+                <span className="rounded-full border border-border px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">
                   Recommended
                 </span>
               )}
               {policy.enabled && (
-                <span className="rounded-full bg-emerald-950 px-2 py-0.5 text-[10px] uppercase tracking-wider text-emerald-400">
+                <span className="inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
                   Active
                 </span>
               )}
             </div>
-            <p className="mt-1 text-sm text-zinc-400">{policy.description}</p>
-            <div className="mt-3 flex items-center gap-3 text-xs text-zinc-500">
+            <p className="mt-1 text-sm text-muted-foreground">{policy.description}</p>
+            <div className="mt-3 flex items-center gap-3 text-xs text-muted-foreground/70">
               <span>{policy.variants.length} variants defined</span>
               {policy.enabled && (
                 <>
@@ -189,11 +189,11 @@ function PolicyCard({
         </div>
 
         {policy.enabled && (
-          <div className="border-t border-zinc-800">
+          <div className="border-t border-border">
             <button
               type="button"
               onClick={() => setExpanded((e) => !e)}
-              className="flex w-full items-center justify-between px-5 py-3 text-sm hover:bg-zinc-900"
+              className="flex w-full items-center justify-between px-5 py-3 text-sm hover:bg-muted"
               style={{ color: "oklch(var(--primary))" }}
               aria-expanded={expanded}
             >
@@ -213,24 +213,24 @@ function PolicyCard({
             </button>
 
             {expanded && (
-              <div className="divide-y divide-zinc-900 border-t border-zinc-900">
+              <div className="divide-y divide-border border-t border-border">
                 {rows.map((row) => (
                   <div key={row.tool_match} className="px-5 py-3">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <code className="rounded bg-zinc-900 px-2 py-0.5 font-mono text-xs text-zinc-200">
+                        <code className="rounded bg-muted px-2 py-0.5 font-mono text-xs text-foreground">
                           {row.tool_match}
                         </code>
                         {row.description && (
-                          <div className="mt-1 text-xs text-zinc-500">{row.description}</div>
+                          <div className="mt-1 text-xs text-muted-foreground/70">{row.description}</div>
                         )}
                       </div>
 
                       <div className="shrink-0">
                         {row.rules.length === 0 ? (
-                          <span className="text-xs text-zinc-500">No active rule</span>
+                          <span className="text-xs text-muted-foreground/70">No active rule</span>
                         ) : (
-                          <span className="rounded-full border border-zinc-700 px-2 py-0.5 text-[11px] text-zinc-400">
+                          <span className="rounded-full border border-border px-2 py-0.5 text-[11px] text-muted-foreground">
                             Blocked on {row.rules.length} agent{row.rules.length === 1 ? "" : "s"}
                           </span>
                         )}
@@ -242,14 +242,14 @@ function PolicyCard({
                         {row.rules.map((r) => (
                           <li
                             key={r.public_id}
-                            className="flex items-center justify-between text-xs text-zinc-400"
+                            className="flex items-center justify-between text-xs text-muted-foreground"
                           >
                             <span className="font-mono">{r.agent_public_id}</span>
                             <button
                               type="button"
                               onClick={() => onDeleteVariant(r.public_id)}
                               disabled={pending.deletingRuleId === r.public_id}
-                              className="rounded px-2 py-1 text-zinc-500 transition-colors hover:bg-red-950 hover:text-red-400 disabled:opacity-50"
+                              className="rounded px-2 py-1 text-muted-foreground/70 transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"
                               aria-label={`Delete rule for ${r.agent_public_id}`}
                               title="Delete this variant for this agent"
                             >
@@ -357,27 +357,27 @@ export default function PoliciesClient() {
   return (
     <div className="mx-auto max-w-4xl">
       <header className="mb-6">
-        <h1 className="text-2xl font-semibold text-zinc-100">Policies</h1>
-        <p className="mt-1 text-sm text-zinc-400">
+        <h1 className="text-2xl font-semibold text-foreground">Policies</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           Predefined rules that block risky agent actions. Toggle a policy on to apply it to all
           connected agents. New agents registered later inherit whatever is enabled here.
         </p>
       </header>
 
       {error && (
-        <div className="mb-4 rounded-xl border border-red-900 bg-red-950/40 p-4 text-sm text-red-200">
+        <div className="mb-4 rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
           {error}
         </div>
       )}
 
       {loading && (
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 text-zinc-400">
+        <div className="rounded-xl border border-border bg-card p-6 text-muted-foreground">
           Loading policies...
         </div>
       )}
 
       {!loading && policies && policies.length === 0 && (
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 text-zinc-400">
+        <div className="rounded-xl border border-border bg-card p-6 text-muted-foreground">
           No policies available.
         </div>
       )}

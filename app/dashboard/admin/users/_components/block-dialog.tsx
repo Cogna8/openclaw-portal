@@ -37,23 +37,23 @@ export default function BlockDialog({ user, onClose, onChanged }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-      <div className="w-full max-w-md rounded-3xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl">
-        <h2 className="text-lg font-semibold text-white">
+      <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 shadow-2xl">
+        <h2 className="text-lg font-semibold text-foreground">
           {willBlock ? "Block user" : "Unblock user"}
         </h2>
-        <p className="mt-2 text-sm text-zinc-400">
+        <p className="mt-2 text-sm text-muted-foreground">
           {willBlock
             ? "Blocked users cannot sign in and their existing session is invalidated on next request."
             : "Unblocking restores sign-in access."}
         </p>
-        <p className="mt-3 text-sm text-white">{target.email}</p>
+        <p className="mt-3 text-sm text-foreground">{target.email}</p>
 
-        {error && <div className="mt-3 text-sm text-red-300">{error}</div>}
+        {error && <div className="mt-3 text-sm text-destructive">{error}</div>}
 
         <div className="mt-6 flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="rounded-xl border border-zinc-700 px-4 py-2 text-sm text-zinc-200"
+            className="rounded-xl border border-border px-4 py-2 text-sm text-foreground"
           >
             Cancel
           </button>
@@ -62,8 +62,8 @@ export default function BlockDialog({ user, onClose, onChanged }: Props) {
             disabled={saving}
             className={
               willBlock
-                ? "rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
-                : "rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                ? "rounded-xl bg-destructive px-4 py-2 text-sm font-semibold text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50"
+                : "rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-foreground disabled:opacity-50"
             }
           >
             {saving
