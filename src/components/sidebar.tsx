@@ -20,6 +20,7 @@ const navItems: NavItem[] = [
   { name: "Policies", href: "/dashboard/policies", disabled: false },
   { name: "Usage", href: "/dashboard/usage", disabled: false },
   { name: "Admin", href: "/dashboard/admin/users", disabled: false, roles: ["admin", "super_admin"] },
+  { name: "Support", href: "/dashboard/support", disabled: false },
 ];
 
 export function Sidebar({ role }: { role: SidebarRole }) {

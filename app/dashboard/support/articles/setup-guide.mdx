@@ -1,0 +1,102 @@
+import { CodeBlock } from "../_components/code-block";
+
+# Setup Guide
+
+Last updated 2026-04-22. Reflects plugin v0.2.1.
+
+This guide walks through installing the Cogna8 plugin for OpenClaw, connecting it to your account, and verifying the integration works.
+
+## Step 1 — Install the plugin
+
+<CodeBlock code={`openclaw plugins install @cogna8/openclaw-plugin
+openclaw gateway restart`} />
+
+The plugin is distributed via public npm. OpenClaw resolves and installs it automatically.
+
+Check the installed version:
+
+<CodeBlock code={`openclaw plugins list`} />
+
+You should see `cogna8` at `0.2.1` or newer.
+
+## Step 2 — Generate an API key
+
+Go to **API Keys** in the sidebar and click **Generate key**. Copy the key (starts with `cg8_sk_`). You will not be shown the key again.
+
+## Step 3 — Add the key to your plugin config
+
+Open your OpenClaw config at `~/.openclaw/openclaw.json` and add a `cogna8` entry under `plugins.entries`:
+
+<CodeBlock code={`{
+  "plugins": {
+    "entries": {
+      "cogna8": {
+        "enabled": true,
+        "config": {
+          "apiKey": "cg8_sk_YOUR_KEY_HERE",
+          "serverUrl": "https://openclaw-api.cogna8.ai",
+          "agentId": "default",
+          "timeoutMs": 3000,
+          "failureMode": "open"
+        }
+      }
+    }
+  }
+}`} />
+
+### Config reference
+
+| Option | Default | Meaning |
+|---|---|---|
+| apiKey | required | API key from the API Keys page |
+| serverUrl | https://openclaw-api.cogna8.ai | Cogna8 service base URL |
+| agentId | default | Agent identifier sent to Cogna8 |
+| timeoutMs | 3000 | Evaluate request timeout in milliseconds |
+| failureMode | open | open allows tool calls on service failure, closed blocks them |
+
+`failureMode: "open"` is the safer default during initial rollout. Switch to `"closed"` once you are confident in the integration and want strict enforcement.
+
+## Step 4 — Restart and verify
+
+Restart the gateway so the new config is loaded:
+
+<CodeBlock code={`openclaw gateway restart`} />
+
+Then confirm the service is reachable with your key:
+
+<CodeBlock code={`curl -s -H "Authorization: Bearer cg8_sk_YOUR_KEY_HERE" https://openclaw-api.cogna8.ai/api/v1/status`} />
+
+A successful connection returns a JSON object with your account plan, usage, and registered agents:
+
+<CodeBlock code={`{
+  "account": {
+    "plan": "free",
+    "evaluations_used": 0,
+    "evaluations_limit": 10000,
+    "mode": "normal"
+  },
+  "agents": [
+    {
+      "id": "agt_...",
+      "name": "OpenClaw Agent (default)",
+      "tools_registered": 0,
+      "active_rules": 0,
+      "last_seen_at": "2026-..."
+    }
+  ],
+  "recent_events": []
+}`} />
+
+If you see your agent listed with a recent `last_seen_at`, the connection is working.
+
+## Step 5 — Troubleshooting
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| openclaw plugins install fails with not found | OpenClaw version too old for npm-sourced plugins | Run `openclaw --version`, upgrade to 2026.4.15 or newer |
+| 401 Unauthorized from /api/v1/status | Wrong or missing API key | Re-check the key on the API Keys page |
+| 404 Agent not found | Agent did not auto-register | Run `openclaw gateway restart` |
+| Gateway log shows failureMode open, service unreachable | serverUrl misconfigured or network issue | Confirm serverUrl is https://openclaw-api.cogna8.ai |
+| Usage counter stays at 0 | agentId in config does not match a registered agent | Check the Agents page to confirm your agent registered |
+
+Still stuck? File a bug at [github.com/Cogna8/openclaw-plugin/issues](https://github.com/Cogna8/openclaw-plugin/issues/new).
