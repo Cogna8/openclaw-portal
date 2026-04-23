@@ -5,7 +5,7 @@ export default function DashboardAgentsPage() {
   return (
     <>
       <Header title="Agents" subtitle="Agents registered by your OpenClaw plugins" />
-      <div className="p-8">
+      <div className="p-4 sm:p-6 md:p-8">
         <AgentsClient />
       </div>
     </>

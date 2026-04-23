@@ -8,7 +8,7 @@ export default function ArticleSubnav({ articles }: { articles: Article[] }) {
   const pathname = usePathname();
 
   return (
-    <nav className="w-64 shrink-0 overflow-y-auto border-r border-border bg-background p-4">
+    <nav className="w-full shrink-0 overflow-y-auto border-r border-border bg-background p-4 md:w-64">
       <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
         Support
       </p>

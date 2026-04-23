@@ -15,7 +15,7 @@ export default async function SupportLayout({
   const articles = getArticlesForRole(role);
 
   return (
-    <div className="flex h-full bg-background">
+    <div className="flex h-full flex-col bg-background md:flex-row">
       <ArticleSubnav articles={articles} />
       <div className="flex-1 overflow-auto">{children}</div>
     </div>

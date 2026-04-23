@@ -5,7 +5,7 @@ export default function DashboardKeysPage() {
   return (
     <>
       <Header title="API Keys" subtitle="Keys used by your OpenClaw plugins to authenticate" />
-      <div className="p-8">
+      <div className="p-4 sm:p-6 md:p-8">
         <KeysClient />
       </div>
     </>
