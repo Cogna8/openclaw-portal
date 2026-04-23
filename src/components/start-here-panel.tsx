@@ -29,12 +29,12 @@ export function StartHerePanel({ userName }: Props) {
       <Step n={1} title="Install the OpenClaw plugin">
         Follow the readme on{" "}
         <a
-          href="https://github.com/cogna8/openclaw"
+          href="https://github.com/Cogna8/openclaw-plugin"
           target="_blank"
           rel="noreferrer"
           className="text-primary underline hover:no-underline"
         >
-          github.com/cogna8/openclaw
+          github.com/Cogna8/openclaw-plugin
         </a>
         . Works with Claude Code and any MCP-compatible agent.
       </Step>
@@ -64,7 +64,7 @@ export function StartHerePanel({ userName }: Props) {
       <div className="border-t pt-3 text-xs text-muted-foreground">
         Stuck?{" "}
         <a
-          href="https://github.com/cogna8/openclaw/issues"
+          href="https://github.com/Cogna8/openclaw-plugin/issues"
           target="_blank"
           rel="noreferrer"
           className="underline hover:no-underline"

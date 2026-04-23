@@ -35,7 +35,7 @@ export default async function LoginPage() {
             <SignInButton />
             <p className="text-[11px] text-muted-foreground">
               Free · No credit card ·{" "}
-              <a href="https://github.com/cogna8/openclaw" target="_blank" rel="noreferrer" className="underline hover:no-underline">
+              <a href="https://github.com/Cogna8/openclaw-plugin" target="_blank" rel="noreferrer" className="underline hover:no-underline">
                 Read the guide on GitHub
               </a>
             </p>
