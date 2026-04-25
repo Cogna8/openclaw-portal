@@ -34,15 +34,6 @@ enum eval_mode_t {
 enum decision_t {
   allow
   block
-  confirm
-}
-
-enum decision_resolution_t {
-  allow_once
-  allow_always
-  deny
-  timeout
-  cancelled
 }
 
 enum action_class_t {
@@ -151,29 +142,27 @@ model UsagePeriod {
 }
 
 model EvaluationEvent {
-  id              String                 @id @db.Uuid
-  publicId        String                 @unique @map("public_id")
-  accountId       String                 @map("account_id") @db.Uuid
-  agentId         String                 @map("agent_id") @db.Uuid
-  apiKeyId        String?                @map("api_key_id") @db.Uuid
-  matchedRuleId   String?                @map("matched_rule_id") @db.Uuid
-  usagePeriodId   String                 @map("usage_period_id") @db.Uuid
+  id              String          @id @db.Uuid
+  publicId        String          @unique @map("public_id")
+  accountId       String          @map("account_id") @db.Uuid
+  agentId         String          @map("agent_id") @db.Uuid
+  apiKeyId        String?         @map("api_key_id") @db.Uuid
+  matchedRuleId   String?         @map("matched_rule_id") @db.Uuid
+  usagePeriodId   String          @map("usage_period_id") @db.Uuid
   decision        decision_t
-  resolution      decision_resolution_t? @map("resolution")
-  resolvedAt      DateTime?              @map("resolved_at") @db.Timestamptz
   mode            eval_mode_t
-  reasonCode      reason_code_t?         @map("reason_code")
+  reasonCode      reason_code_t?  @map("reason_code")
   message         String?
-  sessionId       String                 @map("session_id")
-  sessionKey      String?                @map("session_key")
-  channelProvider String?                @map("channel_provider")
-  channelType     channel_type_t         @map("channel_type")
-  toolName        String                 @map("tool_name")
-  actionClass     action_class_t?        @map("action_class")
+  sessionId       String          @map("session_id")
+  sessionKey      String?         @map("session_key")
+  channelProvider String?         @map("channel_provider")
+  channelType     channel_type_t  @map("channel_type")
+  toolName        String          @map("tool_name")
+  actionClass     action_class_t? @map("action_class")
   targets         Json?
   scope           Json?
-  rawInput        Json?                  @map("raw_input")
-  createdAt       DateTime               @map("created_at") @db.Timestamptz
+  rawInput        Json?           @map("raw_input")
+  createdAt       DateTime        @map("created_at") @db.Timestamptz
 
   account     Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
   apiKey      ApiKey?     @relation(fields: [apiKeyId], references: [id], onDelete: SetNull)

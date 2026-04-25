@@ -10,19 +10,6 @@ type UsageDto = {
   periodEnd: string | null;
 };
 
-type ApprovalsDto = {
-  requested: number;
-  resolved_allow: number;
-  resolved_deny: number;
-  resolved_timeout: number;
-  unresolved: number;
-};
-
-type UsageResponse = {
-  usage: UsageDto;
-  approvals?: ApprovalsDto;
-};
-
 function formatPeriod(start: string | null, end: string | null) {
   if (!start || !end) return "No active period yet";
   const s = new Date(start);
@@ -39,7 +26,6 @@ function formatPeriod(start: string | null, end: string | null) {
 
 export default function UsageClient() {
   const [usage, setUsage] = useState<UsageDto | null>(null);
-  const [approvals, setApprovals] = useState<ApprovalsDto | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,11 +35,10 @@ export default function UsageClient() {
     async function load() {
       try {
         const res = await fetch("/api/usage", { cache: "no-store" });
-        const data: UsageResponse & { error?: string } = await res.json();
+        const data = await res.json();
         if (cancelled) return;
         if (!res.ok) throw new Error(data.error || "Failed to load usage");
         setUsage(data.usage);
-        setApprovals(data.approvals);
         setError(null);
       } catch (e) {
         if (cancelled) return;
@@ -98,7 +83,7 @@ export default function UsageClient() {
 
       {!loading && !error && usage && (
         <>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-3">
             <div className="rounded-xl border border-border bg-card p-5">
               <div className="text-sm text-muted-foreground">Evaluations this period</div>
               <div className="mt-2 text-2xl font-semibold text-foreground">
@@ -131,18 +116,6 @@ export default function UsageClient() {
               <div className="text-sm text-muted-foreground">Period</div>
               <div className="mt-2 text-lg font-medium text-foreground">
                 {formatPeriod(usage.periodStart, usage.periodEnd)}
-              </div>
-            </div>
-
-            <div className="rounded-xl border border-border bg-card p-5">
-              <div className="text-sm text-muted-foreground">Approvals this period</div>
-              <div className="mt-2 text-2xl font-semibold text-foreground">
-                {approvals ? approvals.requested.toLocaleString() : "—"}
-              </div>
-              <div className="mt-2 text-xs text-muted-foreground">
-                {approvals
-                  ? `${approvals.resolved_allow} allow / ${approvals.resolved_deny} deny / ${approvals.resolved_timeout} timeout / ${approvals.unresolved} unresolved`
-                  : "— allow / — deny / — timeout / — unresolved"}
               </div>
             </div>
           </div>
