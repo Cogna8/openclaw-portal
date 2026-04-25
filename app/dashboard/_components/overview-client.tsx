@@ -13,6 +13,19 @@ type UsageDto = {
   periodEnd: string | null;
 };
 
+type ApprovalsDto = {
+  requested: number;
+  resolved_allow: number;
+  resolved_deny: number;
+  resolved_timeout: number;
+  unresolved: number;
+};
+
+type UsageResponse = {
+  usage: UsageDto;
+  approvals?: ApprovalsDto;
+};
+
 type KeyDto = {
   id: string;
   status: string;
@@ -60,7 +73,7 @@ export default function OverviewClient({
         if (!usageRes.ok) throw new Error("Failed to load usage");
         if (!keysRes.ok) throw new Error("Failed to load keys");
 
-        const usageData = await usageRes.json();
+        const usageData: UsageResponse = await usageRes.json();
         const keysData = await keysRes.json();
 
         if (cancelled) return;
