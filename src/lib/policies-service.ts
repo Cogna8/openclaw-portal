@@ -54,6 +54,7 @@ async function parseJsonOrThrow(res: Response, where: string): Promise<any> {
 export type PolicyVariantRule = {
   public_id: string;
   agent_public_id: string;
+  agent_name: string;
   tool_match: string;
   status: "active" | "disabled" | "removed";
 };

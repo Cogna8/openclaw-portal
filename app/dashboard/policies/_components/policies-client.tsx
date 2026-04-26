@@ -7,6 +7,7 @@ import { buildVariantRows } from "@/lib/policy-variants";
 type VariantRule = {
   public_id: string;
   agent_public_id: string;
+  agent_name: string;
   tool_match: string;
   status: "active" | "disabled" | "removed";
 };
@@ -171,7 +172,7 @@ function PolicyCard({
             </div>
             <p className="mt-1 text-sm text-muted-foreground">{policy.description}</p>
             <div className="mt-3 flex items-center gap-3 text-xs text-muted-foreground/70">
-              <span>{policy.variants.length} variants defined</span>
+              <span>{policy.variants.length} actions defined</span>
               {policy.enabled && (
                 <>
                   <span>·</span>
@@ -197,7 +198,7 @@ function PolicyCard({
               style={{ color: "oklch(var(--primary))" }}
               aria-expanded={expanded}
             >
-              <span>{expanded ? "Hide" : "Show"} variant rules</span>
+              <span>{expanded ? "Hide" : "Show"} blocked actions</span>
               <svg
                 width="16"
                 height="16"
@@ -231,7 +232,7 @@ function PolicyCard({
                           <span className="text-xs text-muted-foreground/70">No active rule</span>
                         ) : (
                           <span className="rounded-full border border-border px-2 py-0.5 text-[11px] text-muted-foreground">
-                            Blocked on {row.rules.length} agent{row.rules.length === 1 ? "" : "s"}
+                            Applied to {row.rules.length} agent{row.rules.length === 1 ? "" : "s"}
                           </span>
                         )}
                       </div>
@@ -244,16 +245,16 @@ function PolicyCard({
                             key={r.public_id}
                             className="flex items-center justify-between text-xs text-muted-foreground"
                           >
-                            <span className="font-mono">{r.agent_public_id}</span>
+                            <span className="font-mono">{r.agent_name || r.agent_public_id}</span>
                             <button
                               type="button"
                               onClick={() => onDeleteVariant(r.public_id)}
                               disabled={pending.deletingRuleId === r.public_id}
                               className="rounded px-2 py-1 text-muted-foreground/70 transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"
-                              aria-label={`Delete rule for ${r.agent_public_id}`}
-                              title="Delete this variant for this agent"
+                              aria-label={`Remove rule from ${r.agent_name || r.agent_public_id}`}
+                              title="Remove this rule from this agent"
                             >
-                              {pending.deletingRuleId === r.public_id ? "..." : "Delete"}
+                              {pending.deletingRuleId === r.public_id ? "..." : "Remove"}
                             </button>
                           </li>
                         ))}

@@ -17,6 +17,7 @@ function rule(
   return {
     public_id: "rule_1",
     agent_public_id: "agent_1",
+    agent_name: "Test Agent",
     tool_match: "Bash",
     status: "active",
     ...overrides,
@@ -172,7 +173,7 @@ describe("policies-client disclosure styling", () => {
   const source = readFileSync(clientPath, "utf8");
 
   it("renders the disclosure button with the portal primary (orange) token", () => {
-    const disclosureMarker = '"Show"} variant rules';
+    const disclosureMarker = '"Show"} blocked actions';
     const disclosureIndex = source.indexOf(disclosureMarker);
     expect(disclosureIndex).toBeGreaterThan(-1);
 
@@ -194,7 +195,7 @@ describe("policies-client disclosure styling", () => {
     expect(source).toContain("{row.description}</div>");
   });
 
-  it("shows the 'Blocked on N agents' badge when rules exist", () => {
-    expect(source).toMatch(/Blocked on \{row\.rules\.length\} agent/);
+  it("shows the 'Applied to N agents' badge when rules exist", () => {
+    expect(source).toMatch(/Applied to \{row\.rules\.length\} agent/);
   });
 });
