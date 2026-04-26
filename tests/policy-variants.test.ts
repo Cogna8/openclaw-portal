@@ -190,9 +190,9 @@ describe("policies-client disclosure styling", () => {
     expect(buttonBlock).toContain("oklch(var(--primary))");
   });
 
-  it("renders variant descriptions below the tool_match code", () => {
+  it("renders variant descriptions inline next to the tool_match code", () => {
     expect(source).toContain("{row.description && (");
-    expect(source).toContain("{row.description}</div>");
+    expect(source).toContain("{row.description}</span>");
   });
 
   it("shows the 'Applied to N agents' badge when rules exist", () => {

@@ -219,12 +219,14 @@ function PolicyCard({
                   <div key={row.tool_match} className="px-5 py-3">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <code className="rounded bg-muted px-2 py-0.5 font-mono text-xs text-foreground">
-                          {row.tool_match}
-                        </code>
-                        {row.description && (
-                          <div className="mt-1 text-xs text-muted-foreground/70">{row.description}</div>
-                        )}
+                        <div className="flex items-center gap-2">
+                          <code className="rounded bg-muted px-2 py-0.5 font-mono text-xs text-foreground">
+                            {row.tool_match}
+                          </code>
+                          {row.description && (
+                            <span className="text-xs text-muted-foreground">{row.description}</span>
+                          )}
+                        </div>
                       </div>
 
                       <div className="shrink-0">
