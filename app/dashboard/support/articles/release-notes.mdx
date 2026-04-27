@@ -1,9 +1,26 @@
-import { ReleaseNotesTabs, ReleaseNotesTab } from "../_components/release-notes-tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@cogna8/ui/components/ui/tabs";
 
 This page summarises what has shipped in each Cogna8 OpenClaw release. Click a version to see what was delivered.
 
-<ReleaseNotesTabs defaultValue="v0-4">
-  <ReleaseNotesTab value="v0-4" label="v0.4" current>
+<Tabs defaultValue="v0-4" className="w-full">
+  <TabsList className="mb-6">
+    <TabsTrigger value="v0-4">
+      v0.4
+      <span className="ml-1.5 text-[10px] font-medium uppercase tracking-wider text-primary">
+        Current
+      </span>
+    </TabsTrigger>
+    <TabsTrigger value="v0-3">v0.3</TabsTrigger>
+    <TabsTrigger value="v0-2">v0.2</TabsTrigger>
+    <TabsTrigger value="v0-1">v0.1</TabsTrigger>
+  </TabsList>
+
+  <TabsContent value="v0-4" className="space-y-6">
     <div>
       <h2 className="text-xl font-semibold tracking-tight text-foreground">
         v0.4 — Production refinement
@@ -40,9 +57,9 @@ This page summarises what has shipped in each Cogna8 OpenClaw release. Click a v
         Support articles now use the same page header as the rest of the dashboard, the sidebar shows the portal release version, and recommendation banners are easier to read in light and dark mode.
       </p>
     </div>
-  </ReleaseNotesTab>
+  </TabsContent>
 
-  <ReleaseNotesTab value="v0-3" label="v0.3">
+  <TabsContent value="v0-3" className="space-y-6">
     <div>
       <h2 className="text-xl font-semibold tracking-tight text-foreground">
         v0.3 — Confirmation and richer matching
@@ -62,9 +79,9 @@ This page summarises what has shipped in each Cogna8 OpenClaw release. Click a v
         Rule matching became easier to express for common tool-name and target patterns, reducing the need to list every exact variant by hand.
       </p>
     </div>
-  </ReleaseNotesTab>
+  </TabsContent>
 
-  <ReleaseNotesTab value="v0-2" label="v0.2">
+  <TabsContent value="v0-2" className="space-y-6">
     <div>
       <h2 className="text-xl font-semibold tracking-tight text-foreground">
         v0.2 — Portal and public distribution
@@ -91,9 +108,9 @@ This page summarises what has shipped in each Cogna8 OpenClaw release. Click a v
         Plugin, portal, and service behavior aligned so registered agents could be governed by live policies.
       </p>
     </div>
-  </ReleaseNotesTab>
+  </TabsContent>
 
-  <ReleaseNotesTab value="v0-1" label="v0.1">
+  <TabsContent value="v0-1" className="space-y-6">
     <div>
       <h2 className="text-xl font-semibold tracking-tight text-foreground">
         v0.1 — Foundations
@@ -120,5 +137,5 @@ This page summarises what has shipped in each Cogna8 OpenClaw release. Click a v
         First version of the Cogna8 OpenClaw plugin, providing the transport layer between OpenClaw and the Cogna8 evaluation service.
       </p>
     </div>
-  </ReleaseNotesTab>
-</ReleaseNotesTabs>
+  </TabsContent>
+</Tabs>
