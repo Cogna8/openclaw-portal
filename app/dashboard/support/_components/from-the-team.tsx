@@ -17,7 +17,7 @@ export function FromTheTeam() {
   return (
     <Card className="mt-2 mb-10 gap-5 py-7 bg-gradient-to-t from-white/[0.03] to-card shadow-xs">
       <CardHeader className="pb-1">
-        <CardTitle className="text-xl tracking-tight">From the team</CardTitle>
+        <CardTitle className="text-xl tracking-tight text-primary">From the team</CardTitle>
         <p className="text-sm text-muted-foreground">
           A short note to the OpenClaw community.
         </p>
