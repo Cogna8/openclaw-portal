@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import CreateKeyModal from "./create-key-modal";
 import RevokeKeyDialog from "./revoke-key-dialog";
 
-type ApiKeyRow = {
+export type ApiKeyRow = {
   id: string;
   publicId: string;
   label: string;
@@ -18,23 +18,29 @@ type ApiKeyRow = {
 
 export default function KeysClient() {
   const [keys, setKeys] = useState<ApiKeyRow[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [revokeTarget, setRevokeTarget] = useState<ApiKeyRow | null>(null);
 
-  async function load() {
-    setLoading(true);
-    setError(null);
+  async function load(options?: { background?: boolean }) {
+    if (options?.background) {
+      setRefreshing(true);
+    } else {
+      setInitialLoading(true);
+    }
     try {
       const res = await fetch("/api/keys", { cache: "no-store" });
-      if (!res.ok) throw new Error("Failed to load keys");
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to load keys");
       setKeys(data.keys ?? []);
+      setError(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load keys");
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
+      setRefreshing(false);
     }
   }
 
@@ -43,8 +49,8 @@ export default function KeysClient() {
   }, []);
 
   const isEmpty = useMemo(
-    () => !loading && keys.length === 0,
-    [loading, keys.length]
+    () => !initialLoading && keys.length === 0,
+    [initialLoading, keys.length]
   );
 
   return (
@@ -55,6 +61,9 @@ export default function KeysClient() {
           <p className="mt-1 text-sm text-muted-foreground">
             Create and manage the keys your OpenClaw plugin uses to talk to Cogna8.
           </p>
+          {refreshing && keys.length > 0 && (
+            <p className="mt-1 text-xs text-muted-foreground">Refreshing…</p>
+          )}
         </div>
         {!isEmpty && (
           <button
@@ -66,7 +75,7 @@ export default function KeysClient() {
         )}
       </div>
 
-      {loading && (
+      {initialLoading && keys.length === 0 && (
         <div className="rounded-xl border border-border bg-card p-6 text-muted-foreground">
           Loading keys...
         </div>
@@ -94,7 +103,7 @@ export default function KeysClient() {
         </div>
       )}
 
-      {!loading && !error && keys.length > 0 && (
+      {!error && keys.length > 0 && (
         <div className="overflow-hidden rounded-xl border border-border bg-card">
           <table className="min-w-full divide-y divide-border text-sm">
             <thead className="bg-muted/50 text-muted-foreground">
@@ -145,13 +154,29 @@ export default function KeysClient() {
       <CreateKeyModal
         open={createOpen}
         onClose={() => setCreateOpen(false)}
-        onCreated={() => void load()}
+        onCreated={(key) => {
+          setKeys((current) => {
+            const withoutDuplicate = current.filter((k) => k.publicId !== key.publicId);
+            return [key, ...withoutDuplicate];
+          });
+          void load({ background: true });
+        }}
       />
 
       <RevokeKeyDialog
         keyRow={revokeTarget}
         onClose={() => setRevokeTarget(null)}
-        onRevoked={() => void load()}
+        onRevoked={(publicId) => {
+          const now = new Date().toISOString();
+          setKeys((current) =>
+            current.map((key) =>
+              key.publicId === publicId
+                ? { ...key, status: "revoked" as const, revokedAt: key.revokedAt ?? now }
+                : key,
+            ),
+          );
+          void load({ background: true });
+        }}
       />
     </div>
   );

@@ -367,7 +367,8 @@ function PolicyCard({
 
 export default function PoliciesClient() {
   const [policies, setPolicies] = useState<PolicyItem[] | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [deletingRuleId, setDeletingRuleId] = useState<string | null>(null);
@@ -382,7 +383,12 @@ export default function PoliciesClient() {
     };
   }, []);
 
-  async function load() {
+  async function load(options?: { background?: boolean }) {
+    if (options?.background) {
+      setRefreshing(true);
+    } else {
+      setInitialLoading(true);
+    }
     try {
       const res = await fetch("/api/policies", { cache: "no-store" });
       const data = await res.json();
@@ -394,7 +400,10 @@ export default function PoliciesClient() {
       if (!mountedRef.current) return;
       setError(e instanceof Error ? e.message : "Failed to load policies");
     } finally {
-      if (mountedRef.current) setLoading(false);
+      if (mountedRef.current) {
+        setInitialLoading(false);
+        setRefreshing(false);
+      }
     }
   }
 
@@ -412,7 +421,18 @@ export default function PoliciesClient() {
       );
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `Failed to ${path} policy`);
-      await load();
+      const now = new Date().toISOString();
+      setPolicies((current) =>
+        current?.map((policy) => {
+          if (policy.id !== templateId) return policy;
+          if (nextEnabled) {
+            return { ...policy, enabled: true, enabled_at: policy.enabled_at ?? now };
+          }
+          return { ...policy, enabled: false, enabled_at: null, rules: [] };
+        }) ?? current,
+      );
+      setError(null);
+      void load({ background: true });
     } catch (e) {
       if (!mountedRef.current) return;
       setError(e instanceof Error ? e.message : "Toggle failed");
@@ -430,7 +450,14 @@ export default function PoliciesClient() {
       );
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Delete failed");
-      await load();
+      setPolicies((current) =>
+        current?.map((policy) => ({
+          ...policy,
+          rules: policy.rules.filter((rule) => rule.public_id !== rulePublicId),
+        })) ?? current,
+      );
+      setError(null);
+      void load({ background: true });
     } catch (e) {
       if (!mountedRef.current) return;
       setError(e instanceof Error ? e.message : "Delete failed");
@@ -459,7 +486,16 @@ export default function PoliciesClient() {
         `Critical defaults applied. ${data.enabled_template_ids.length} enabled, ${data.already_enabled_template_ids.length} already active.`,
       );
 
-      await load();
+      const now = new Date().toISOString();
+      setPolicies((current) =>
+        current?.map((policy) =>
+          policy.risk_class === "critical"
+            ? { ...policy, enabled: true, enabled_at: policy.enabled_at ?? now }
+            : policy,
+        ) ?? current,
+      );
+      setError(null);
+      void load({ background: true });
     } catch (error) {
       if (!mountedRef.current) return;
       setError(
@@ -494,6 +530,9 @@ export default function PoliciesClient() {
           Predefined rules that block risky agent actions. Toggle a policy on to apply it to all
           connected agents. New agents registered later inherit whatever is enabled here.
         </p>
+        {refreshing && policies && (
+          <p className="mt-1 text-xs text-muted-foreground">Refreshing…</p>
+        )}
       </header>
 
       {error && (
@@ -502,19 +541,19 @@ export default function PoliciesClient() {
         </div>
       )}
 
-      {loading && (
+      {initialLoading && !policies && (
         <div className="rounded-xl border border-border bg-card p-6 text-muted-foreground">
           Loading policies...
         </div>
       )}
 
-      {!loading && policies && policies.length === 0 && (
+      {policies && policies.length === 0 && (
         <div className="rounded-xl border border-border bg-card p-6 text-muted-foreground">
           No policies available.
         </div>
       )}
 
-      {!loading && policies && policies.length > 0 && (
+      {policies && policies.length > 0 && (
         <div className="mb-6 rounded-xl border border-border bg-card p-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -547,7 +586,7 @@ export default function PoliciesClient() {
         </div>
       )}
 
-      {!loading && policies && policies.length > 0 && (
+      {policies && policies.length > 0 && (
         <div className="space-y-8">
           {grouped.map((group) => (
             <section key={group.category}>

@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 
+import type { ApiKeyRow } from "./keys-client";
+
 type Props = {
   open: boolean;
   onClose: () => void;
-  onCreated: () => void;
+  onCreated: (key: ApiKeyRow) => void;
 };
 
 export default function CreateKeyModal({ open, onClose, onCreated }: Props) {
@@ -35,7 +37,7 @@ export default function CreateKeyModal({ open, onClose, onCreated }: Props) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to create key");
       setRawKey(data.rawKey);
-      onCreated();
+      onCreated(data.key as ApiKeyRow);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to create key");
     } finally {

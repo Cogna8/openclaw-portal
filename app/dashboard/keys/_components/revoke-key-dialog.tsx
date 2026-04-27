@@ -8,7 +8,7 @@ type KeyRow = {
 type Props = {
   keyRow: KeyRow;
   onClose: () => void;
-  onRevoked: () => void;
+  onRevoked: (publicId: string) => void;
 };
 
 export default function RevokeKeyDialog({ keyRow, onClose, onRevoked }: Props) {
@@ -20,7 +20,7 @@ export default function RevokeKeyDialog({ keyRow, onClose, onRevoked }: Props) {
     const res = await fetch(`/api/keys/${target.publicId}`, { method: "DELETE" });
     if (res.ok) {
       onClose();
-      onRevoked();
+      onRevoked(target.publicId);
     }
   }
 

@@ -54,13 +54,20 @@ export default function OverviewClient({
   const [activeKeys, setActiveKeys] = useState<number | null>(null);
   const [totalKeys, setTotalKeys] = useState<number | null>(null);
   const [onboardingCompleted, setOnboardingCompleted] = useState<boolean | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
-    async function load() {
+    async function load(options?: { background?: boolean }) {
+      if (cancelled) return;
+      if (options?.background) {
+        setRefreshing(true);
+      } else {
+        setInitialLoading(true);
+      }
       try {
         const [usageRes, keysRes, onboardingRes] = await Promise.all([
           fetch("/api/usage", { cache: "no-store" }),
@@ -100,12 +107,15 @@ export default function OverviewClient({
         if (cancelled) return;
         setError(e instanceof Error ? e.message : "Failed to load overview");
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setInitialLoading(false);
+          setRefreshing(false);
+        }
       }
     }
 
     void load();
-    const interval = setInterval(load, 5000);
+    const interval = setInterval(() => void load({ background: true }), 5000);
     return () => {
       cancelled = true;
       clearInterval(interval);
@@ -126,7 +136,11 @@ export default function OverviewClient({
       )}
       <RecommendedPoliciesBanner />
 
-      {loading && !usage && (
+      {refreshing && usage && (
+        <p className="text-xs text-muted-foreground">Refreshing…</p>
+      )}
+
+      {initialLoading && !usage && (
         <div className="rounded-xl border bg-card p-6 text-sm text-muted-foreground shadow-sm">
           Loading overview...
         </div>

@@ -40,31 +40,41 @@ function formatPeriod(start: string | null, end: string | null) {
 export default function UsageClient() {
   const [usage, setUsage] = useState<UsageDto | null>(null);
   const [approvals, setApprovals] = useState<ApprovalsDto | undefined>(undefined);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
-    async function load() {
+    async function load(options?: { background?: boolean }) {
+      if (cancelled) return;
+      if (options?.background) {
+        setRefreshing(true);
+      } else {
+        setInitialLoading(true);
+      }
       try {
         const res = await fetch("/api/usage", { cache: "no-store" });
         const data: UsageResponse & { error?: string } = await res.json();
-        if (cancelled) return;
         if (!res.ok) throw new Error(data.error || "Failed to load usage");
-        setUsage(data.usage);
-        setApprovals(data.approvals);
-        setError(null);
+        if (!cancelled) {
+          setUsage(data.usage);
+          setApprovals(data.approvals);
+          setError(null);
+        }
       } catch (e) {
-        if (cancelled) return;
-        setError(e instanceof Error ? e.message : "Failed to load usage");
+        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load usage");
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setInitialLoading(false);
+          setRefreshing(false);
+        }
       }
     }
 
     void load();
-    const interval = setInterval(load, 5000);
+    const interval = setInterval(() => void load({ background: true }), 5000);
     return () => {
       cancelled = true;
       clearInterval(interval);
@@ -83,9 +93,12 @@ export default function UsageClient() {
         <p className="mt-1 text-sm text-muted-foreground">
           Track your monthly evaluation usage and current service mode.
         </p>
+        {refreshing && usage && (
+          <p className="mt-1 text-xs text-muted-foreground">Refreshing…</p>
+        )}
       </div>
 
-      {loading && (
+      {initialLoading && !usage && (
         <div className="rounded-xl border border-border bg-card p-6 text-muted-foreground">
           Loading usage...
         </div>
@@ -96,7 +109,7 @@ export default function UsageClient() {
         </div>
       )}
 
-      {!loading && !error && usage && (
+      {!error && usage && (
         <>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-xl border border-border bg-card p-5">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type AgentDto = {
   publicId: string;
@@ -101,34 +101,45 @@ function CopyButton({ value }: { value: string }) {
 
 export default function AgentsClient() {
   const [agents, setAgents] = useState<AgentDto[] | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showArchived, setShowArchived] = useState(false);
   const [pendingPublicId, setPendingPublicId] = useState<string | null>(null);
+  const loadRef = useRef<((options?: { background?: boolean }) => Promise<void>) | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
-    async function load() {
+    async function load(options?: { background?: boolean }) {
+      if (cancelled) return;
+      if (options?.background) {
+        setRefreshing(true);
+      } else {
+        setInitialLoading(true);
+      }
       try {
         const query = showArchived ? "?status=all" : "?status=active";
         const res = await fetch(`/api/agents${query}`, { cache: "no-store" });
         const data = await res.json();
-        if (cancelled) return;
         if (!res.ok) throw new Error(data.error || "Failed to load agents");
-        setAgents(data.agents ?? []);
-        setError(null);
+        if (!cancelled) {
+          setAgents(data.agents ?? []);
+          setError(null);
+        }
       } catch (e) {
-        if (cancelled) return;
-        setError(e instanceof Error ? e.message : "Failed to load agents");
+        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load agents");
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setInitialLoading(false);
+          setRefreshing(false);
+        }
       }
     }
 
-    setLoading(true);
+    loadRef.current = load;
     void load();
-    const interval = setInterval(load, 5000);
+    const interval = setInterval(() => void load({ background: true }), 5000);
     return () => {
       cancelled = true;
       clearInterval(interval);
@@ -145,14 +156,19 @@ export default function AgentsClient() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `Failed to ${next} agent`);
 
-      const query = showArchived ? "?status=all" : "?status=active";
-      const refetch = await fetch(`/api/agents${query}`, { cache: "no-store" });
-      const refetchData = await refetch.json();
-      if (!refetch.ok) {
-        throw new Error(refetchData.error || "Failed to refresh agents");
-      }
-      setAgents(refetchData.agents ?? []);
+      setAgents((current) => {
+        if (!current) return current;
+        if (!showArchived && next === "archive") {
+          return current.filter((agent) => agent.publicId !== publicId);
+        }
+        return current.map((agent) =>
+          agent.publicId === publicId
+            ? { ...agent, status: next === "archive" ? "archived" : "active" }
+            : agent,
+        );
+      });
       setError(null);
+      void loadRef.current?.({ background: true });
     } catch (e) {
       setError(e instanceof Error ? e.message : `Failed to ${next} agent`);
     } finally {
@@ -162,8 +178,13 @@ export default function AgentsClient() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4">
-        <label className="ml-auto inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-md border bg-card px-3 py-2 text-sm hover:bg-accent">
+      <div className="flex items-center justify-between gap-4">
+        {refreshing && agents ? (
+          <span className="text-xs text-muted-foreground">Refreshing…</span>
+        ) : (
+          <span />
+        )}
+        <label className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-md border bg-card px-3 py-2 text-sm hover:bg-accent">
           <input
             type="checkbox"
             checked={showArchived}
@@ -174,7 +195,7 @@ export default function AgentsClient() {
         </label>
       </div>
 
-      {loading && !agents && (
+      {initialLoading && !agents && (
         <div className="rounded-xl border bg-card p-6 text-sm text-muted-foreground shadow-sm">
           Loading agents...
         </div>
