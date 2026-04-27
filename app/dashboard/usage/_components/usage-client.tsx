@@ -105,11 +105,11 @@ export default function UsageClient() {
       )}
       {error && (
         <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-6 text-sm text-destructive">
-          {error}
+          {usage ? `Refresh failed: ${error}` : error}
         </div>
       )}
 
-      {!error && usage && (
+      {usage && (
         <>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-xl border border-border bg-card p-5">

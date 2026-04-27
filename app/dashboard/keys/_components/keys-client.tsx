@@ -49,8 +49,8 @@ export default function KeysClient() {
   }, []);
 
   const isEmpty = useMemo(
-    () => !initialLoading && keys.length === 0,
-    [initialLoading, keys.length]
+    () => !initialLoading && !error && keys.length === 0,
+    [initialLoading, error, keys.length]
   );
 
   return (
@@ -82,7 +82,7 @@ export default function KeysClient() {
       )}
       {error && (
         <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-6 text-sm text-destructive">
-          {error}
+          {keys.length > 0 ? `Refresh failed: ${error}` : error}
         </div>
       )}
 
@@ -103,7 +103,7 @@ export default function KeysClient() {
         </div>
       )}
 
-      {!error && keys.length > 0 && (
+      {keys.length > 0 && (
         <div className="overflow-hidden rounded-xl border border-border bg-card">
           <table className="min-w-full divide-y divide-border text-sm">
             <thead className="bg-muted/50 text-muted-foreground">
