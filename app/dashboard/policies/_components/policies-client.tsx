@@ -2,6 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { Badge } from "@cogna8/ui/components/ui/badge";
+import { Button } from "@cogna8/ui/components/ui/button";
+
 import { buildVariantRows } from "@/lib/policy-variants";
 
 type VariantRule = {
@@ -17,6 +20,20 @@ type VariantDetailed = {
   description: string;
 };
 
+type PolicyRiskClass = "critical" | "high" | "medium";
+type PolicyCategory =
+  | "filesystem"
+  | "network"
+  | "code_execution"
+  | "destructive_ops";
+
+type SecureDefaultsResult = {
+  enabled_template_ids: string[];
+  already_enabled_template_ids: string[];
+  rules_created: number;
+  agents_touched: number;
+};
+
 type PolicyItem = {
   id: string;
   name: string;
@@ -27,9 +44,71 @@ type PolicyItem = {
   variants: string[];
   variants_detailed?: VariantDetailed[];
   rules: VariantRule[];
+  risk_class: PolicyRiskClass;
+  category: PolicyCategory;
 };
 
 type ListResponse = { policies: PolicyItem[] };
+
+const CATEGORY_ORDER: PolicyCategory[] = [
+  "code_execution",
+  "destructive_ops",
+  "filesystem",
+  "network",
+];
+
+const CATEGORY_LABELS: Record<PolicyCategory, string> = {
+  code_execution: "Code execution",
+  destructive_ops: "Destructive operations",
+  filesystem: "Filesystem",
+  network: "Network",
+};
+
+const RISK_ORDER: Record<PolicyRiskClass, number> = {
+  critical: 0,
+  high: 1,
+  medium: 2,
+};
+
+function RiskBadge({ riskClass }: { riskClass: PolicyRiskClass }) {
+  if (riskClass === "critical") {
+    return (
+      <Badge
+        variant="default"
+        className="border border-primary/30 bg-primary/15 text-primary hover:bg-primary/15"
+      >
+        Critical
+      </Badge>
+    );
+  }
+
+  if (riskClass === "high") {
+    return (
+      <Badge variant="secondary" className="text-foreground">
+        High
+      </Badge>
+    );
+  }
+
+  return (
+    <Badge variant="outline" className="text-muted-foreground">
+      Medium
+    </Badge>
+  );
+}
+
+function groupPolicies(policies: PolicyItem[]) {
+  return CATEGORY_ORDER.map((category) => ({
+    category,
+    policies: policies
+      .filter((policy) => policy.category === category)
+      .sort((a, b) => {
+        const riskDelta = RISK_ORDER[a.risk_class] - RISK_ORDER[b.risk_class];
+        if (riskDelta !== 0) return riskDelta;
+        return a.name.localeCompare(b.name);
+      }),
+  })).filter((group) => group.policies.length > 0);
+}
 
 function countActiveRules(policy: PolicyItem): number {
   return policy.rules.filter((r) => r.status === "active").length;
@@ -157,8 +236,9 @@ function PolicyCard({
       <div className="rounded-xl border border-border bg-card">
         <div className="flex items-start gap-4 p-5">
           <div className="flex-1">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <h3 className="text-base font-semibold text-foreground">{policy.name}</h3>
+              <RiskBadge riskClass={policy.risk_class} />
               {policy.default_enabled && (
                 <span className="rounded-full border border-border px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">
                   Recommended
@@ -291,6 +371,8 @@ export default function PoliciesClient() {
   const [error, setError] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [deletingRuleId, setDeletingRuleId] = useState<string | null>(null);
+  const [applyingDefaults, setApplyingDefaults] = useState(false);
+  const [defaultsMessage, setDefaultsMessage] = useState<string | null>(null);
   const mountedRef = useRef(true);
 
   useEffect(() => {
@@ -357,6 +439,53 @@ export default function PoliciesClient() {
     }
   }
 
+  async function applyCriticalDefaults() {
+    setApplyingDefaults(true);
+    setDefaultsMessage(null);
+
+    try {
+      const res = await fetch("/api/policies/secure-defaults", {
+        method: "POST",
+      });
+      const data = (await res.json()) as SecureDefaultsResult & {
+        error?: string;
+      };
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to apply critical defaults");
+      }
+
+      setDefaultsMessage(
+        `Critical defaults applied. ${data.enabled_template_ids.length} enabled, ${data.already_enabled_template_ids.length} already active.`,
+      );
+
+      await load();
+    } catch (error) {
+      if (!mountedRef.current) return;
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Failed to apply critical defaults",
+      );
+    } finally {
+      if (mountedRef.current) setApplyingDefaults(false);
+    }
+  }
+
+  const criticalPolicies = useMemo(
+    () => (policies ?? []).filter((policy) => policy.risk_class === "critical"),
+    [policies],
+  );
+
+  const allCriticalEnabled =
+    criticalPolicies.length > 0 &&
+    criticalPolicies.every((policy) => policy.enabled);
+
+  const grouped = useMemo(
+    () => (policies ? groupPolicies(policies) : []),
+    [policies],
+  );
+
   return (
     <div className="mx-auto max-w-4xl">
       <header className="mb-6">
@@ -386,18 +515,60 @@ export default function PoliciesClient() {
       )}
 
       {!loading && policies && policies.length > 0 && (
-        <div className="space-y-4">
-          {policies.map((policy) => (
-            <PolicyCard
-              key={policy.id}
-              policy={policy}
-              onToggle={togglePolicy}
-              onDeleteVariant={deleteVariantRule}
-              pending={{
-                toggling: togglingId === policy.id,
-                deletingRuleId: deletingRuleId,
-              }}
-            />
+        <div className="mb-6 rounded-xl border border-border bg-card p-5">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-base font-semibold text-foreground">
+                Critical defaults
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Enables the highest-impact protections for shell execution, code
+                execution, and file deletion.
+              </p>
+              {defaultsMessage && (
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {defaultsMessage}
+                </p>
+              )}
+            </div>
+
+            <Button
+              type="button"
+              onClick={applyCriticalDefaults}
+              disabled={applyingDefaults || allCriticalEnabled}
+            >
+              {applyingDefaults
+                ? "Applying..."
+                : allCriticalEnabled
+                  ? "Critical defaults applied"
+                  : "Apply critical defaults"}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {!loading && policies && policies.length > 0 && (
+        <div className="space-y-8">
+          {grouped.map((group) => (
+            <section key={group.category}>
+              <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                {CATEGORY_LABELS[group.category]}
+              </h2>
+              <div className="space-y-4">
+                {group.policies.map((policy) => (
+                  <PolicyCard
+                    key={policy.id}
+                    policy={policy}
+                    onToggle={togglePolicy}
+                    onDeleteVariant={deleteVariantRule}
+                    pending={{
+                      toggling: togglingId === policy.id,
+                      deletingRuleId: deletingRuleId,
+                    }}
+                  />
+                ))}
+              </div>
+            </section>
           ))}
         </div>
       )}

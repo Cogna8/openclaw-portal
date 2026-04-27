@@ -4,6 +4,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { UserMenu } from "./user-menu";
 import { useMobileNav } from "./mobile-nav-context";
+import { RELEASE_VERSION } from "@/lib/release";
 
 type SidebarRole = "user" | "admin" | "super_admin";
 
@@ -47,7 +48,12 @@ export function Sidebar({ role }: { role: SidebarRole }) {
           <Image src="/openclaw-mascot.png" alt="OpenClaw" width={40} height={40} />
           <div>
             <h1 className="text-base font-semibold leading-tight">Cogna8</h1>
-            <p className="text-xs text-muted-foreground">OpenClaw Portal</p>
+            <p className="text-xs text-muted-foreground">
+              OpenClaw Portal
+              <span className="ml-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/80">
+                {RELEASE_VERSION}
+              </span>
+            </p>
           </div>
         </div>
 

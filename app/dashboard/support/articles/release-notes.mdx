@@ -1,0 +1,124 @@
+import { ReleaseNotesTabs, ReleaseNotesTab } from "../_components/release-notes-tabs";
+
+This page summarises what has shipped in each Cogna8 OpenClaw release. Click a version to see what was delivered.
+
+<ReleaseNotesTabs defaultValue="v0-4">
+  <ReleaseNotesTab value="v0-4" label="v0.4" current>
+    <div>
+      <h2 className="text-xl font-semibold tracking-tight text-foreground">
+        v0.4 — Production refinement
+      </h2>
+      <p className="mt-2 text-muted-foreground">
+        This release focuses on making Cogna8 safer and clearer to operate across real OpenClaw installs.
+      </p>
+    </div>
+
+    <div>
+      <h3 className="text-base font-semibold text-foreground">Multi-agent identity</h3>
+      <p className="mt-1 text-muted-foreground">
+        A single Cogna8 plugin install can now identify multiple OpenClaw agents. Each agent is registered and governed under its own identity instead of every call being attributed to one default agent.
+      </p>
+    </div>
+
+    <div>
+      <h3 className="text-base font-semibold text-foreground">Resilient evaluation path</h3>
+      <p className="mt-1 text-muted-foreground">
+        The plugin now handles transient service failures more predictably with retry and circuit-breaker behavior, then applies the configured failure mode when the service cannot be reached.
+      </p>
+    </div>
+
+    <div>
+      <h3 className="text-base font-semibold text-foreground">Expanded policy coverage</h3>
+      <p className="mt-1 text-muted-foreground">
+        Built-in policy templates now match a wider range of common tool names. The policy gallery groups protections by category, labels risk level, and includes a one-click action for applying critical defaults.
+      </p>
+    </div>
+
+    <div>
+      <h3 className="text-base font-semibold text-foreground">Portal polish</h3>
+      <p className="mt-1 text-muted-foreground">
+        Support articles now use the same page header as the rest of the dashboard, the sidebar shows the portal release version, and recommendation banners are easier to read in light and dark mode.
+      </p>
+    </div>
+  </ReleaseNotesTab>
+
+  <ReleaseNotesTab value="v0-3" label="v0.3">
+    <div>
+      <h2 className="text-xl font-semibold tracking-tight text-foreground">
+        v0.3 — Confirmation and richer matching
+      </h2>
+    </div>
+
+    <div>
+      <h3 className="text-base font-semibold text-foreground">Confirm decisions</h3>
+      <p className="mt-1 text-muted-foreground">
+        Policies can require explicit confirmation before an action runs, in addition to outright blocking. Confirmations surface in the OpenClaw approval flow and are recorded against the original tool call.
+      </p>
+    </div>
+
+    <div>
+      <h3 className="text-base font-semibold text-foreground">Pattern matching in rules</h3>
+      <p className="mt-1 text-muted-foreground">
+        Rule matching became easier to express for common tool-name and target patterns, reducing the need to list every exact variant by hand.
+      </p>
+    </div>
+  </ReleaseNotesTab>
+
+  <ReleaseNotesTab value="v0-2" label="v0.2">
+    <div>
+      <h2 className="text-xl font-semibold tracking-tight text-foreground">
+        v0.2 — Portal and public distribution
+      </h2>
+    </div>
+
+    <div>
+      <h3 className="text-base font-semibold text-foreground">Portal launched</h3>
+      <p className="mt-1 text-muted-foreground">
+        The Cogna8 OpenClaw Portal launched for managing API keys, usage, agents, policies, and setup documentation.
+      </p>
+    </div>
+
+    <div>
+      <h3 className="text-base font-semibold text-foreground">Plugin distribution</h3>
+      <p className="mt-1 text-muted-foreground">
+        The Cogna8 plugin became installable through the standard OpenClaw plugin workflow instead of requiring manual repository setup.
+      </p>
+    </div>
+
+    <div>
+      <h3 className="text-base font-semibold text-foreground">End-to-end enforcement</h3>
+      <p className="mt-1 text-muted-foreground">
+        Plugin, portal, and service behavior aligned so registered agents could be governed by live policies.
+      </p>
+    </div>
+  </ReleaseNotesTab>
+
+  <ReleaseNotesTab value="v0-1" label="v0.1">
+    <div>
+      <h2 className="text-xl font-semibold tracking-tight text-foreground">
+        v0.1 — Foundations
+      </h2>
+    </div>
+
+    <div>
+      <h3 className="text-base font-semibold text-foreground">Evaluation engine</h3>
+      <p className="mt-1 text-muted-foreground">
+        Core allow/block evaluation for OpenClaw tool calls based on rules registered for an agent.
+      </p>
+    </div>
+
+    <div>
+      <h3 className="text-base font-semibold text-foreground">Rules and agents</h3>
+      <p className="mt-1 text-muted-foreground">
+        Initial rule types, agent registration, and the service foundations for policy enforcement.
+      </p>
+    </div>
+
+    <div>
+      <h3 className="text-base font-semibold text-foreground">Cogna8 plugin MVP</h3>
+      <p className="mt-1 text-muted-foreground">
+        First version of the Cogna8 OpenClaw plugin, providing the transport layer between OpenClaw and the Cogna8 evaluation service.
+      </p>
+    </div>
+  </ReleaseNotesTab>
+</ReleaseNotesTabs>

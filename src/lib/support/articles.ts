@@ -17,6 +17,13 @@ export const articles: Article[] = [
     visibility: "all",
     file: "setup-guide.mdx",
   },
+  {
+    slug: "release-notes",
+    title: "Release Notes",
+    description: "What shipped in each Cogna8 OpenClaw release.",
+    visibility: "all",
+    file: "release-notes.mdx",
+  },
 ];
 
 export function getArticleBySlug(slug: string): Article | undefined {

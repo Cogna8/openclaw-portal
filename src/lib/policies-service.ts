@@ -64,16 +64,32 @@ export type PolicyVariantDetailed = {
   description: string;
 };
 
+export type PolicyRiskClass = "critical" | "high" | "medium";
+export type PolicyCategory =
+  | "filesystem"
+  | "network"
+  | "code_execution"
+  | "destructive_ops";
+
 export type PolicyListItem = {
   id: string;
   name: string;
   description: string;
   default_enabled: boolean;
+  risk_class: PolicyRiskClass;
+  category: PolicyCategory;
   enabled: boolean;
   enabled_at: string | null;
   variants: string[];
   variants_detailed?: PolicyVariantDetailed[];
   rules: PolicyVariantRule[];
+};
+
+export type ApplySecureDefaultsResult = {
+  enabled_template_ids: string[];
+  already_enabled_template_ids: string[];
+  rules_created: number;
+  agents_touched: number;
 };
 
 export async function listPolicies(ctx: {
@@ -134,4 +150,20 @@ export async function deleteTemplateVariantRule(ctx: {
     },
   );
   return parseJsonOrThrow(res, "deleteTemplateVariantRule");
+}
+
+export async function applySecureDefaults(ctx: {
+  accountId: string;
+  userId: string | null;
+}): Promise<ApplySecureDefaultsResult> {
+  const res = await fetch(
+    `${getServiceBaseUrl()}/api/v1/portal/policies/secure-defaults`,
+    {
+      method: "POST",
+      headers: buildHeaders(ctx),
+      cache: "no-store",
+    },
+  );
+
+  return parseJsonOrThrow(res, "applySecureDefaults");
 }

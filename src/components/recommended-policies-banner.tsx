@@ -3,6 +3,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@cogna8/ui/components/ui/alert";
+import { Button } from "@cogna8/ui/components/ui/button";
+
 type PolicySummary = {
   id: string;
   name: string;
@@ -78,61 +85,59 @@ export function RecommendedPoliciesBanner() {
 
   if (state.kind === "error") {
     return (
-      <div className="rounded-2xl border border-red-900 bg-red-950/30 p-5 text-sm text-red-200">
-        Could not enable all recommended policies: {state.message}. You can retry
-        from the{" "}
-        <Link
-          href="/dashboard/policies"
-          className="underline underline-offset-2 hover:text-red-100"
-        >
-          Policies page
-        </Link>
-        .
-      </div>
+      <Alert variant="destructive">
+        <AlertTitle>Could not enable all recommended policies</AlertTitle>
+        <AlertDescription>
+          {state.message}. You can retry from the{" "}
+          <Link
+            href="/dashboard/policies"
+            className="underline underline-offset-2"
+          >
+            Policies page
+          </Link>
+          .
+        </AlertDescription>
+      </Alert>
     );
   }
 
   if (state.kind === "enabling") {
     return (
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-5 text-sm text-zinc-300">
-        Enabling recommended policies...
-      </div>
+      <Alert>
+        <AlertTitle>Enabling recommended policies</AlertTitle>
+        <AlertDescription>
+          Applying recommended protections to your connected agents...
+        </AlertDescription>
+      </Alert>
     );
   }
 
-  // kind === "visible"
   return (
-    <div className="rounded-2xl border border-amber-900/60 bg-amber-950/20 p-5">
-      <div className="flex items-start gap-4">
-        <div className="flex-1">
-          <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold text-amber-100">
-              No recommended policies are active
-            </h3>
-          </div>
-          <p className="mt-1 text-sm text-amber-200/80">
-            {state.missing.length} recommended{" "}
-            {state.missing.length === 1 ? "policy" : "policies"} can protect your
-            agents from risky actions like shell command execution, file deletion,
-            file writes, and code execution.
-          </p>
-        </div>
-        <div className="flex shrink-0 gap-2">
-          <Link
-            href="/dashboard/policies"
-            className="rounded-lg border border-amber-800 px-3 py-1.5 text-sm text-amber-100 hover:bg-amber-950/40"
-          >
-            Review
-          </Link>
-          <button
-            type="button"
-            onClick={() => enableAll(state.missing)}
-            className="rounded-lg bg-amber-600 px-3 py-1.5 text-sm font-medium text-amber-50 hover:bg-amber-500"
-          >
-            Enable recommended
-          </button>
-        </div>
+    <Alert className="flex items-start gap-4">
+      <div className="flex-1">
+        <AlertTitle className="text-base">
+          No recommended policies are active
+        </AlertTitle>
+        <AlertDescription className="mt-1">
+          {state.missing.length} recommended{" "}
+          {state.missing.length === 1 ? "policy" : "policies"} can protect your
+          agents from risky actions like shell command execution, file deletion,
+          file writes, and code execution.
+        </AlertDescription>
       </div>
-    </div>
+
+      <div className="flex shrink-0 gap-2">
+        <Button asChild variant="outline" size="sm">
+          <Link href="/dashboard/policies">Review</Link>
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          onClick={() => enableAll(state.missing)}
+        >
+          Enable recommended
+        </Button>
+      </div>
+    </Alert>
   );
 }

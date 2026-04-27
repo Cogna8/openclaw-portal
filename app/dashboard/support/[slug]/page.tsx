@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
+import { Header } from "@/components/header";
 import {
   canUserSeeArticle,
   getArticleBySlug,
@@ -50,21 +51,27 @@ export default async function SupportArticlePage({
 
   if (!MDXContent) {
     return (
-      <div className="mx-auto max-w-3xl p-8">
-        <div className="rounded-md border border-border bg-card p-6 text-card-foreground">
-          <h1 className="text-lg font-semibold">Article unavailable</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            We could not load this support article. Please try again later or
-            contact support if the problem persists.
-          </p>
+      <>
+        <Header title="Support" subtitle="Article unavailable" />
+        <div className="mx-auto max-w-3xl p-4 sm:p-6 md:p-8">
+          <div className="rounded-md border border-border bg-card p-6 text-card-foreground">
+            <h2 className="text-lg font-semibold">Article unavailable</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              We could not load this support article. Please try again later or
+              contact support if the problem persists.
+            </p>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <article className="mx-auto max-w-3xl p-8">
-      <MDXContent />
-    </article>
+    <>
+      <Header title={article.title} subtitle={article.description} />
+      <article className="mx-auto max-w-3xl p-4 sm:p-6 md:p-8">
+        <MDXContent />
+      </article>
+    </>
   );
 }
