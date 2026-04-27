@@ -50,6 +50,19 @@ type PolicyItem = {
 
 type ListResponse = { policies: PolicyItem[] };
 
+type PolicyToggleOp = {
+  opId: number;
+  templateId: string;
+  nextEnabled: boolean;
+  snapshot: PolicyItem | null;
+};
+
+type RuleDeleteOp = {
+  opId: number;
+  rulePublicId: string;
+  snapshot: PolicyItem[] | null;
+};
+
 const CATEGORY_ORDER: PolicyCategory[] = [
   "code_execution",
   "destructive_ops",
@@ -207,7 +220,7 @@ function PolicyCard({
   policy: PolicyItem;
   onToggle: (templateId: string, nextEnabled: boolean) => Promise<void>;
   onDeleteVariant: (rulePublicId: string) => Promise<void>;
-  pending: { toggling: boolean; deletingRuleId: string | null };
+  pending: { toggling: boolean; deletingRuleIds: Set<string> };
 }) {
   const [expanded, setExpanded] = useState(false);
   const [confirmDisable, setConfirmDisable] = useState(false);
@@ -331,12 +344,12 @@ function PolicyCard({
                             <button
                               type="button"
                               onClick={() => onDeleteVariant(r.public_id)}
-                              disabled={pending.deletingRuleId === r.public_id}
+                              disabled={pending.deletingRuleIds.has(r.public_id)}
                               className="rounded px-2 py-1 text-muted-foreground/70 transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"
                               aria-label={`Remove rule from ${r.agent_name || r.agent_public_id}`}
                               title="Remove this rule from this agent"
                             >
-                              {pending.deletingRuleId === r.public_id ? "..." : "Remove"}
+                              {pending.deletingRuleIds.has(r.public_id) ? "..." : "Remove"}
                             </button>
                           </li>
                         ))}
@@ -370,11 +383,20 @@ export default function PoliciesClient() {
   const [initialLoading, setInitialLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [togglingId, setTogglingId] = useState<string | null>(null);
-  const [deletingRuleId, setDeletingRuleId] = useState<string | null>(null);
+  const [pendingPolicyIds, setPendingPolicyIds] = useState<Set<string>>(
+    () => new Set(),
+  );
+  const [pendingRuleIds, setPendingRuleIds] = useState<Set<string>>(
+    () => new Set(),
+  );
   const [applyingDefaults, setApplyingDefaults] = useState(false);
   const [defaultsMessage, setDefaultsMessage] = useState<string | null>(null);
   const mountedRef = useRef(true);
+
+  const nextOptimisticOpId = useRef(1);
+  const policiesRef = useRef<PolicyItem[] | null>(null);
+  const policyToggleOpsRef = useRef<Map<string, PolicyToggleOp>>(new Map());
+  const ruleDeleteOpsRef = useRef<Map<string, RuleDeleteOp>>(new Map());
 
   useEffect(() => {
     mountedRef.current = true;
@@ -382,6 +404,103 @@ export default function PoliciesClient() {
       mountedRef.current = false;
     };
   }, []);
+
+  useEffect(() => {
+    policiesRef.current = policies;
+  }, [policies]);
+
+  function updatePolicies(
+    updater: (current: PolicyItem[] | null) => PolicyItem[] | null,
+  ) {
+    setPolicies((current) => {
+      const next = updater(current);
+      policiesRef.current = next;
+      return next;
+    });
+  }
+
+  function addPendingPolicyId(templateId: string) {
+    setPendingPolicyIds((current) => {
+      const next = new Set(current);
+      next.add(templateId);
+      return next;
+    });
+  }
+
+  function removePendingPolicyId(templateId: string) {
+    setPendingPolicyIds((current) => {
+      const next = new Set(current);
+      next.delete(templateId);
+      return next;
+    });
+  }
+
+  function addPendingRuleId(rulePublicId: string) {
+    setPendingRuleIds((current) => {
+      const next = new Set(current);
+      next.add(rulePublicId);
+      return next;
+    });
+  }
+
+  function removePendingRuleId(rulePublicId: string) {
+    setPendingRuleIds((current) => {
+      const next = new Set(current);
+      next.delete(rulePublicId);
+      return next;
+    });
+  }
+
+  function isCurrentPolicyOp(op: PolicyToggleOp): boolean {
+    return policyToggleOpsRef.current.get(op.templateId)?.opId === op.opId;
+  }
+
+  function isCurrentRuleOp(op: RuleDeleteOp): boolean {
+    return ruleDeleteOpsRef.current.get(op.rulePublicId)?.opId === op.opId;
+  }
+
+  function applyPolicyTogglePatch(
+    policy: PolicyItem,
+    nextEnabled: boolean,
+  ): PolicyItem {
+    if (nextEnabled) {
+      return {
+        ...policy,
+        enabled: true,
+        enabled_at: policy.enabled_at ?? new Date().toISOString(),
+      };
+    }
+
+    return {
+      ...policy,
+      enabled: false,
+      enabled_at: null,
+      rules: [],
+    };
+  }
+
+  function applyPendingPolicyPatches(
+    serverPolicies: PolicyItem[],
+  ): PolicyItem[] {
+    let result = serverPolicies.map((policy) => {
+      const op = policyToggleOpsRef.current.get(policy.id);
+      if (!op) return policy;
+      return applyPolicyTogglePatch(policy, op.nextEnabled);
+    });
+
+    if (ruleDeleteOpsRef.current.size > 0) {
+      const deletedRuleIds = new Set(ruleDeleteOpsRef.current.keys());
+
+      result = result.map((policy) => ({
+        ...policy,
+        rules: policy.rules.filter(
+          (rule) => !deletedRuleIds.has(rule.public_id),
+        ),
+      }));
+    }
+
+    return result;
+  }
 
   async function load(options?: { background?: boolean }) {
     if (options?.background) {
@@ -394,7 +513,8 @@ export default function PoliciesClient() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to load policies");
       if (!mountedRef.current) return;
-      setPolicies((data as ListResponse).policies ?? []);
+      const serverPolicies = (data as ListResponse).policies ?? [];
+      updatePolicies(() => applyPendingPolicyPatches(serverPolicies));
       setError(null);
     } catch (e) {
       if (!mountedRef.current) return;
@@ -412,57 +532,132 @@ export default function PoliciesClient() {
   }, []);
 
   async function togglePolicy(templateId: string, nextEnabled: boolean) {
-    setTogglingId(templateId);
+    if (
+      pendingPolicyIds.has(templateId) ||
+      policyToggleOpsRef.current.has(templateId)
+    ) {
+      return;
+    }
+
+    const snapshot =
+      policiesRef.current?.find((policy) => policy.id === templateId) ?? null;
+
+    const op: PolicyToggleOp = {
+      opId: nextOptimisticOpId.current++,
+      templateId,
+      nextEnabled,
+      snapshot,
+    };
+
+    policyToggleOpsRef.current.set(templateId, op);
+    addPendingPolicyId(templateId);
+    setError(null);
+
+    updatePolicies((current) =>
+      current?.map((policy) =>
+        policy.id === templateId
+          ? applyPolicyTogglePatch(policy, nextEnabled)
+          : policy,
+      ) ?? current,
+    );
+
     try {
       const path = nextEnabled ? "enable" : "disable";
       const res = await fetch(
         `/api/policies/${encodeURIComponent(templateId)}/${path}`,
         { method: "POST" },
       );
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `Failed to ${path} policy`);
-      const now = new Date().toISOString();
-      setPolicies((current) =>
-        current?.map((policy) => {
-          if (policy.id !== templateId) return policy;
-          if (nextEnabled) {
-            return { ...policy, enabled: true, enabled_at: policy.enabled_at ?? now };
-          }
-          return { ...policy, enabled: false, enabled_at: null, rules: [] };
-        }) ?? current,
-      );
-      setError(null);
+
+      if (!mountedRef.current) return;
+
+      if (isCurrentPolicyOp(op)) {
+        policyToggleOpsRef.current.delete(templateId);
+        removePendingPolicyId(templateId);
+      }
+
       void load({ background: true });
     } catch (e) {
       if (!mountedRef.current) return;
-      setError(e instanceof Error ? e.message : "Toggle failed");
-    } finally {
-      if (mountedRef.current) setTogglingId(null);
+
+      if (isCurrentPolicyOp(op)) {
+        policyToggleOpsRef.current.delete(templateId);
+        removePendingPolicyId(templateId);
+
+        if (op.snapshot) {
+          updatePolicies((current) =>
+            current?.map((policy) =>
+              policy.id === templateId ? op.snapshot! : policy,
+            ) ?? current,
+          );
+        } else {
+          void load({ background: true });
+        }
+
+        setError(e instanceof Error ? e.message : "Policy update failed");
+      }
     }
   }
 
   async function deleteVariantRule(rulePublicId: string) {
-    setDeletingRuleId(rulePublicId);
+    if (
+      pendingRuleIds.has(rulePublicId) ||
+      ruleDeleteOpsRef.current.has(rulePublicId)
+    ) {
+      return;
+    }
+
+    const op: RuleDeleteOp = {
+      opId: nextOptimisticOpId.current++,
+      rulePublicId,
+      snapshot: policiesRef.current ? [...policiesRef.current] : null,
+    };
+
+    ruleDeleteOpsRef.current.set(rulePublicId, op);
+    addPendingRuleId(rulePublicId);
+    setError(null);
+
+    updatePolicies((current) =>
+      current?.map((policy) => ({
+        ...policy,
+        rules: policy.rules.filter((rule) => rule.public_id !== rulePublicId),
+      })) ?? current,
+    );
+
     try {
       const res = await fetch(
         `/api/policies/rules/${encodeURIComponent(rulePublicId)}`,
         { method: "DELETE" },
       );
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Delete failed");
-      setPolicies((current) =>
-        current?.map((policy) => ({
-          ...policy,
-          rules: policy.rules.filter((rule) => rule.public_id !== rulePublicId),
-        })) ?? current,
-      );
-      setError(null);
+
+      if (!mountedRef.current) return;
+
+      if (isCurrentRuleOp(op)) {
+        ruleDeleteOpsRef.current.delete(rulePublicId);
+        removePendingRuleId(rulePublicId);
+      }
+
       void load({ background: true });
     } catch (e) {
       if (!mountedRef.current) return;
-      setError(e instanceof Error ? e.message : "Delete failed");
-    } finally {
-      if (mountedRef.current) setDeletingRuleId(null);
+
+      if (isCurrentRuleOp(op)) {
+        ruleDeleteOpsRef.current.delete(rulePublicId);
+        removePendingRuleId(rulePublicId);
+
+        if (op.snapshot) {
+          updatePolicies(() => op.snapshot);
+        } else {
+          void load({ background: true });
+        }
+
+        setError(e instanceof Error ? e.message : "Delete failed");
+      }
     }
   }
 
@@ -487,7 +682,7 @@ export default function PoliciesClient() {
       );
 
       const now = new Date().toISOString();
-      setPolicies((current) =>
+      updatePolicies((current) =>
         current?.map((policy) =>
           policy.risk_class === "critical"
             ? { ...policy, enabled: true, enabled_at: policy.enabled_at ?? now }
@@ -601,8 +796,8 @@ export default function PoliciesClient() {
                     onToggle={togglePolicy}
                     onDeleteVariant={deleteVariantRule}
                     pending={{
-                      toggling: togglingId === policy.id,
-                      deletingRuleId: deletingRuleId,
+                      toggling: pendingPolicyIds.has(policy.id),
+                      deletingRuleIds: pendingRuleIds,
                     }}
                   />
                 ))}

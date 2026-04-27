@@ -16,6 +16,13 @@ type AgentDto = {
   lastSeenAt: string;
 };
 
+type AgentArchiveOp = {
+  opId: number;
+  publicId: string;
+  next: "archive" | "unarchive";
+  snapshot: AgentDto | null;
+};
+
 function formatRelative(iso: string): string {
   const then = new Date(iso).getTime();
   const now = Date.now();
@@ -105,8 +112,70 @@ export default function AgentsClient() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showArchived, setShowArchived] = useState(false);
-  const [pendingPublicId, setPendingPublicId] = useState<string | null>(null);
+  const [pendingAgentIds, setPendingAgentIds] = useState<Set<string>>(
+    () => new Set(),
+  );
   const loadRef = useRef<((options?: { background?: boolean }) => Promise<void>) | null>(null);
+
+  const nextAgentOpId = useRef(1);
+  const agentsRef = useRef<AgentDto[] | null>(null);
+  const agentOpsRef = useRef<Map<string, AgentArchiveOp>>(new Map());
+
+  useEffect(() => {
+    agentsRef.current = agents;
+  }, [agents]);
+
+  function updateAgents(
+    updater: (current: AgentDto[] | null) => AgentDto[] | null,
+  ) {
+    setAgents((current) => {
+      const next = updater(current);
+      agentsRef.current = next;
+      return next;
+    });
+  }
+
+  function addPendingAgentId(publicId: string) {
+    setPendingAgentIds((current) => {
+      const next = new Set(current);
+      next.add(publicId);
+      return next;
+    });
+  }
+
+  function removePendingAgentId(publicId: string) {
+    setPendingAgentIds((current) => {
+      const next = new Set(current);
+      next.delete(publicId);
+      return next;
+    });
+  }
+
+  function isCurrentAgentOp(op: AgentArchiveOp): boolean {
+    return agentOpsRef.current.get(op.publicId)?.opId === op.opId;
+  }
+
+  function applyPendingAgentPatches(serverAgents: AgentDto[]): AgentDto[] {
+    let result = [...serverAgents];
+
+    for (const op of agentOpsRef.current.values()) {
+      if (!showArchived && op.next === "archive") {
+        result = result.filter((agent) => agent.publicId !== op.publicId);
+        continue;
+      }
+
+      result = result.map((agent) =>
+        agent.publicId === op.publicId
+          ? {
+              ...agent,
+              status: op.next === "archive" ? "archived" : "active",
+            }
+          : agent,
+      );
+    }
+
+    return result;
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -124,7 +193,7 @@ export default function AgentsClient() {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Failed to load agents");
         if (!cancelled) {
-          setAgents(data.agents ?? []);
+          updateAgents(() => applyPendingAgentPatches(data.agents ?? []));
           setError(null);
         }
       } catch (e) {
@@ -147,32 +216,83 @@ export default function AgentsClient() {
   }, [showArchived]);
 
   async function archiveAgent(publicId: string, next: "archive" | "unarchive") {
-    setPendingPublicId(publicId);
+    if (
+      pendingAgentIds.has(publicId) ||
+      agentOpsRef.current.has(publicId)
+    ) {
+      return;
+    }
+
+    const snapshot =
+      agentsRef.current?.find((agent) => agent.publicId === publicId) ?? null;
+
+    const op: AgentArchiveOp = {
+      opId: nextAgentOpId.current++,
+      publicId,
+      next,
+      snapshot,
+    };
+
+    agentOpsRef.current.set(publicId, op);
+    addPendingAgentId(publicId);
+    setError(null);
+
+    updateAgents((current) => {
+      if (!current) return current;
+
+      if (!showArchived && next === "archive") {
+        return current.filter((agent) => agent.publicId !== publicId);
+      }
+
+      return current.map((agent) =>
+        agent.publicId === publicId
+          ? {
+              ...agent,
+              status: next === "archive" ? "archived" : "active",
+            }
+          : agent,
+      );
+    });
+
     try {
       const res = await fetch(
         `/api/agents/${encodeURIComponent(publicId)}/${next}`,
         { method: "POST" },
       );
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `Failed to ${next} agent`);
 
-      setAgents((current) => {
-        if (!current) return current;
-        if (!showArchived && next === "archive") {
-          return current.filter((agent) => agent.publicId !== publicId);
-        }
-        return current.map((agent) =>
-          agent.publicId === publicId
-            ? { ...agent, status: next === "archive" ? "archived" : "active" }
-            : agent,
-        );
-      });
-      setError(null);
+      if (isCurrentAgentOp(op)) {
+        agentOpsRef.current.delete(publicId);
+        removePendingAgentId(publicId);
+      }
+
       void loadRef.current?.({ background: true });
     } catch (e) {
-      setError(e instanceof Error ? e.message : `Failed to ${next} agent`);
-    } finally {
-      setPendingPublicId(null);
+      if (isCurrentAgentOp(op)) {
+        agentOpsRef.current.delete(publicId);
+        removePendingAgentId(publicId);
+
+        if (op.snapshot) {
+          updateAgents((current) => {
+            if (!current) return [op.snapshot!];
+
+            const without = current.filter(
+              (agent) => agent.publicId !== publicId,
+            );
+
+            const shouldShowSnapshot =
+              showArchived || op.snapshot!.status === "active";
+
+            return shouldShowSnapshot ? [op.snapshot!, ...without] : without;
+          });
+        } else {
+          void loadRef.current?.({ background: true });
+        }
+
+        setError(e instanceof Error ? e.message : `Failed to ${next} agent`);
+      }
     }
   }
 
@@ -255,7 +375,7 @@ export default function AgentsClient() {
               {agents.map((a) => {
                 const recent = isRecentlyActive(a.lastSeenAt);
                 const isArchived = a.status === "archived";
-                const pending = pendingPublicId === a.publicId;
+                const pending = pendingAgentIds.has(a.publicId);
                 return (
                   <tr
                     key={a.publicId}
