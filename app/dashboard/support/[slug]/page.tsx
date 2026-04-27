@@ -6,7 +6,6 @@ import {
   canUserSeeArticle,
   getArticleBySlug,
 } from "@/lib/support/articles";
-import { FromTheTeam } from "../_components/from-the-team";
 
 export async function generateMetadata({
   params,
@@ -71,7 +70,6 @@ export default async function SupportArticlePage({
     <>
       <Header title={article.title} subtitle={article.description} />
       <article className="mx-auto max-w-3xl p-4 sm:p-6 md:p-8">
-        <FromTheTeam />
         <MDXContent />
       </article>
     </>
