@@ -5,4 +5,4 @@ export {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@cogna8/ui/components/ui/tabs";
+} from "@/components/tabs";
