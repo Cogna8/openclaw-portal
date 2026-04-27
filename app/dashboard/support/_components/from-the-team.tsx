@@ -1,4 +1,9 @@
-import { Card, CardContent, CardHeader } from "@cogna8/ui/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@cogna8/ui/components/ui/card";
 
 /**
  * A short, hand-written note from the Cogna8 team to OpenClaw users.
@@ -10,16 +15,14 @@ import { Card, CardContent, CardHeader } from "@cogna8/ui/components/ui/card";
  */
 export function FromTheTeam() {
   return (
-    <Card className="mb-8 bg-gradient-to-t from-white/[0.03] to-card shadow-xs">
-      <CardHeader>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
-          From the team
-        </p>
+    <Card className="mt-2 mb-10 gap-5 py-7 bg-gradient-to-t from-white/[0.03] to-card shadow-xs">
+      <CardHeader className="pb-1">
+        <CardTitle className="text-xl tracking-tight">From the team</CardTitle>
         <p className="text-sm text-muted-foreground">
           A short note to the OpenClaw community.
         </p>
       </CardHeader>
-      <CardContent className="space-y-4 text-[15px] leading-relaxed text-card-foreground">
+      <CardContent className="space-y-5 text-[15px] leading-relaxed text-card-foreground">
         <p>
           We think the question of trust in this new realm of intelligence is a long road
           ahead, and what you&apos;ll find here are just first, mechanical steps into a much
@@ -34,7 +37,7 @@ export function FromTheTeam() {
           give something, even if little, that&apos;s meaningful and, more importantly,
           useful to fellow explorers.
         </p>
-        <p className="pt-1 text-muted-foreground">The Cogna8 team</p>
+        <p className="pt-2 text-muted-foreground">The Cogna8 team</p>
       </CardContent>
     </Card>
   );
