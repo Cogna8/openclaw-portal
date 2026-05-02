@@ -5,6 +5,7 @@ import { AppProviders } from "@/components/app-providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://openclaw.cogna8.ai"),
   title: "OpenClaw Portal - Cogna8",
   description: "Self-service portal for OpenClaw agent governance",
   icons: {
