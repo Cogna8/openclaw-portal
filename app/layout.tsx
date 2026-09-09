@@ -41,10 +41,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="en"
       suppressHydrationWarning
       className={`${GeistSans.variable} ${GeistMono.variable}`}
-      style={{
-        ["--font-sans" as any]: "var(--font-geist-sans)",
-        ["--font-mono" as any]: "var(--font-geist-mono)",
-      }}
+      style={
+        {
+          "--font-sans": "var(--font-geist-sans)",
+          "--font-mono": "var(--font-geist-mono)",
+        } as React.CSSProperties
+      }
     >
       <body className="antialiased">
         <AppProviders>{children}</AppProviders>

@@ -1,4 +1,5 @@
 import { getPortalDb } from "@/lib/portal-db";
+import type { Prisma } from "@prisma/client";
 import type { AdminContext } from "@/lib/auth/admin-context";
 
 type AuditAction =
@@ -29,13 +30,13 @@ export async function writeAuditEvent(input: AuditWriteInput): Promise<void> {
     data: {
       actorPortalUserId: input.actor.actorUserId,
       actorEmail: input.actor.actorEmail,
-      action: input.action as any,
-      targetType: input.targetType as any,
+      action: input.action,
+      targetType: input.targetType,
       targetId: input.targetId,
       targetLabel: input.targetLabel,
-      before: input.before as any,
-      after: input.after as any,
-      metadata: input.metadata as any,
+      before: input.before as Prisma.InputJsonValue | undefined,
+      after: input.after as Prisma.InputJsonValue | undefined,
+      metadata: input.metadata as Prisma.InputJsonValue | undefined,
     },
   });
 }

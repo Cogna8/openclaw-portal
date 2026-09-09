@@ -1,6 +1,7 @@
 import { Sidebar } from "@/components/sidebar";
 import { MobileNavProvider } from "@/components/mobile-nav-context";
 import { auth } from "@/lib/auth";
+import { getSessionRole } from "@/lib/session-role";
 
 export default async function DashboardLayout({
   children,
@@ -8,10 +9,7 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
-  const role = (((session as any)?.role ?? (session as any)?.user?.role ?? "user") as
-    | "user"
-    | "admin"
-    | "super_admin");
+  const role = getSessionRole(session);
 
   return (
     <MobileNavProvider>

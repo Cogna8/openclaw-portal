@@ -3,6 +3,7 @@ import { createOpenClawAccount } from "../lib/openclaw-db";
 import { enableDefaultPoliciesForNewAccount } from "../lib/policies-bootstrap";
 import { generateAccountId } from "../lib/ids";
 import { SUPER_ADMIN_EMAIL } from "../lib/constants";
+import type { Prisma } from "@prisma/client";
 
 export async function handleSignIn(profile: {
   email: string;
@@ -18,9 +19,9 @@ export async function handleSignIn(profile: {
     if (existing.isBlocked && !isSuperAdmin) {
       return { userId: existing.id, role: existing.role, openclawAccountId: existing.openclawAccountId, allowed: false };
     }
-    const updateData: Record<string, unknown> = { lastLoginAt: new Date() };
+    const updateData: Prisma.PortalUserUpdateInput = { lastLoginAt: new Date() };
     if (isSuperAdmin && existing.role !== "super_admin") updateData.role = "super_admin";
-    await db.portalUser.update({ where: { id: existing.id }, data: updateData as any });
+    await db.portalUser.update({ where: { id: existing.id }, data: updateData });
     return { userId: existing.id, role: isSuperAdmin ? "super_admin" : existing.role, openclawAccountId: existing.openclawAccountId, allowed: true };
   }
 
@@ -34,7 +35,7 @@ export async function handleSignIn(profile: {
       name: profile.name,
       image: profile.image,
       googleId: profile.googleId,
-      role: role as any,
+      role: role,
       openclawAccountId: account.id,
       lastLoginAt: new Date(),
     },

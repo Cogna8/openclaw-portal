@@ -10,6 +10,8 @@
     "prisma:migrate-deploy": "prisma migrate deploy --schema=prisma/schema.prisma",
     "build": "npm run prisma:generate && npm run prisma:migrate-deploy && next build",
     "start": "next start",
+    "typecheck": "npm run prisma:generate && tsc --noEmit",
+    "lint": "eslint .",
     "test": "vitest run"
   },
   "pnpm": {
@@ -41,10 +43,13 @@
     "shadcn": "^4.4.0"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.0",
     "@types/mdx": "^2.0.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^15.0.0",
     "postcss": "^8.0.0",
     "prisma": "^6.19.0",
     "tailwindcss": "^4.2.4",

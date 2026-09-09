@@ -2,13 +2,12 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Header } from "@/components/header";
 import OverviewClient from "./_components/overview-client";
-
-type Role = "user" | "admin" | "super_admin";
+import { getSessionRole } from "@/lib/session-role";
 
 export default async function DashboardPage() {
   const session = await auth();
   if (!session) redirect("/");
-  const role = (((session as any)?.role ?? (session as any)?.user?.role ?? "user") as Role);
+  const role = getSessionRole(session);
   const userName = session?.user?.name ?? null;
   return (
     <>

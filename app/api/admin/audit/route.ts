@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPortalDb } from "@/lib/portal-db";
+import { admin_audit_action_t, admin_audit_target_t } from "@prisma/client";
 import {
   requireAdminContext,
   AuthRequiredError,
@@ -14,6 +15,13 @@ export async function GET(request: Request) {
     const actor = url.searchParams.get("actor")?.trim() || "";
     const action = url.searchParams.get("action")?.trim() || "";
     const targetType = url.searchParams.get("targetType")?.trim() || "";
+
+    if (action && !(action in admin_audit_action_t)) {
+      return NextResponse.json({ error: "Invalid action filter" }, { status: 400 });
+    }
+    if (targetType && !(targetType in admin_audit_target_t)) {
+      return NextResponse.json({ error: "Invalid targetType filter" }, { status: 400 });
+    }
     const from = url.searchParams.get("from");
     const to = url.searchParams.get("to");
     const limitRaw = Number(url.searchParams.get("limit") || "100");
@@ -23,8 +31,8 @@ export async function GET(request: Request) {
     const rows = await db.adminAuditLog.findMany({
       where: {
         ...(actor ? { actorEmail: actor } : {}),
-        ...(action ? { action: action as any } : {}),
-        ...(targetType ? { targetType: targetType as any } : {}),
+        ...(action ? { action: action as admin_audit_action_t } : {}),
+        ...(targetType ? { targetType: targetType as admin_audit_target_t } : {}),
         ...((from || to)
           ? {
               createdAt: {

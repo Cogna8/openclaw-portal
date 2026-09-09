@@ -26,7 +26,7 @@ export async function GET(request: Request) {
           ],
         }),
         ...(roleFilter === "user" || roleFilter === "admin" || roleFilter === "super_admin"
-          ? { role: roleFilter as any }
+          ? { role: roleFilter }
           : {}),
         ...(statusFilter === "blocked" ? { isBlocked: true } : {}),
         ...(statusFilter === "active" ? { isBlocked: false } : {}),

@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { Header } from "@/components/header";
+import { getSessionRole } from "@/lib/session-role";
 import {
   canUserSeeArticle,
   getArticleBySlug,
@@ -33,9 +34,7 @@ export default async function SupportArticlePage({
   if (!article) notFound();
 
   const session = await auth();
-  const role = (((session as any)?.role ??
-    (session as any)?.user?.role ??
-    "user") as "user" | "admin" | "super_admin");
+  const role = getSessionRole(session);
 
   if (!canUserSeeArticle(article, role)) {
     redirect("/dashboard");

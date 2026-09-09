@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { getArticlesForRole } from "@/lib/support/articles";
+import { getSessionRole } from "@/lib/session-role";
 import ArticleSubnav from "./_components/article-subnav";
 
 export default async function SupportLayout({
@@ -8,9 +9,7 @@ export default async function SupportLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
-  const role = (((session as any)?.role ??
-    (session as any)?.user?.role ??
-    "user") as "user" | "admin" | "super_admin");
+  const role = getSessionRole(session);
 
   const articles = getArticlesForRole(role);
 

@@ -8,8 +8,9 @@ export function normalizeProxyError(
   error: unknown,
   fallback = "Internal server error",
 ): { status: number; message: string } {
-  const status = (error as any)?.status;
-  const bodyError = (error as any)?.body?.error;
+  const err = error as { status?: unknown; body?: { error?: unknown } };
+  const status = err?.status;
+  const bodyError = err?.body?.error;
 
   return {
     status: typeof status === "number" ? status : 500,

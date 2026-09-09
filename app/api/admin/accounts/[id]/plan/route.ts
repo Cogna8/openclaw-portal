@@ -35,7 +35,7 @@ export async function PATCH(
 
     const updated = await db.account.update({
       where: { id },
-      data: { plan: newPlan as any },
+      data: { plan: newPlan },
       select: { id: true, publicId: true, plan: true },
     });
 

@@ -15,7 +15,7 @@ export async function PATCH(
     const actor = await requireSuperAdminContext();
     const { id } = await params;
     const body = await request.json().catch(() => ({}));
-    const newRole = body?.role;
+    const newRole: unknown = body?.role;
 
     if (newRole !== "user" && newRole !== "admin") {
       return NextResponse.json({ error: "Invalid role" }, { status: 400 });
@@ -43,7 +43,7 @@ export async function PATCH(
     const result = await db.$transaction(async (tx) => {
       const updated = await tx.portalUser.update({
         where: { id },
-        data: { role: newRole as any },
+        data: { role: newRole },
         select: { id: true, email: true, role: true },
       });
 
@@ -51,12 +51,12 @@ export async function PATCH(
         data: {
           actorPortalUserId: actor.actorUserId,
           actorEmail: actor.actorEmail,
-          action: action as any,
+          action,
           targetType: "portal_user",
           targetId: updated.id,
           targetLabel: updated.email,
-          before: { role: existing.role } as any,
-          after: { role: updated.role } as any,
+          before: { role: existing.role },
+          after: { role: updated.role },
         },
       });
 

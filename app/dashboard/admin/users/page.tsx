@@ -1,13 +1,11 @@
 import { auth } from "@/lib/auth";
 import { Header } from "@/components/header";
 import UsersClient from "./_components/users-client";
+import { getSessionRole } from "@/lib/session-role";
 
 export default async function AdminUsersPage() {
   const session = await auth();
-  const viewerRole = ((session as any)?.role ?? "user") as
-    | "user"
-    | "admin"
-    | "super_admin";
+  const viewerRole = getSessionRole(session);
   const viewerEmail = session?.user?.email ?? "";
 
   return (

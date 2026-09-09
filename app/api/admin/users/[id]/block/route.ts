@@ -46,12 +46,12 @@ async function setBlocked(id: string, block: boolean, actor: AdminContext) {
       data: {
         actorPortalUserId: actor.actorUserId,
         actorEmail: actor.actorEmail,
-        action: action as any,
+        action,
         targetType: "portal_user",
         targetId: updated.id,
         targetLabel: updated.email,
-        before: { isBlocked: existing.isBlocked } as any,
-        after: { isBlocked: updated.isBlocked } as any,
+        before: { isBlocked: existing.isBlocked },
+        after: { isBlocked: updated.isBlocked },
       },
     });
 

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { ServiceHttpError } from "../src/lib/policies-service";
 
 const {
   mockGetCurrentAccountContext,
@@ -52,8 +53,8 @@ beforeEach(() => {
   vi.spyOn(console, "error").mockImplementation(() => {});
 });
 
-function downstreamError(status: number, message: string): Error {
-  const err: any = new Error(`downstream ${status}`);
+function downstreamError(status: number, message: string): ServiceHttpError {
+  const err = new Error(`downstream ${status}`) as ServiceHttpError;
   err.status = status;
   err.body = { error: message };
   return err;

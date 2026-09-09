@@ -32,23 +32,34 @@ function buildHeaders(params: { accountId: string; userId: string | null }): Hea
   return headers;
 }
 
-async function parseJsonOrThrow(res: Response, where: string): Promise<any> {
+export interface ServiceHttpError extends Error {
+  status: number;
+  body: unknown;
+}
+
+async function parseJsonOrThrow<T>(res: Response, where: string): Promise<T> {
   const text = await res.text();
-  let data: any = null;
+  let data: unknown;
   try {
     data = text ? JSON.parse(text) : null;
   } catch {
-    // leave data null; fall through
+    // leave data undefined; fall through
   }
   if (!res.ok) {
+    const errorMessage =
+      data && typeof data === "object" && "error" in data
+        ? String((data as { error: unknown }).error)
+        : undefined;
     const err = new Error(
-      `[policies-service] ${where} failed: ${res.status} ${res.statusText}${data?.error ? ` - ${data.error}` : ""}`,
-    );
-    (err as any).status = res.status;
-    (err as any).body = data;
+      `[policies-service] ${where} failed: ${res.status} ${res.statusText}${errorMessage ? ` - ${errorMessage}` : ""}`,
+    ) as ServiceHttpError;
+    err.status = res.status;
+    err.body = data;
     throw err;
   }
-  return data;
+  // The service's response shape is trusted here based on the endpoint
+  // contract; callers pin the concrete type via parseJsonOrThrow<T>.
+  return data as T;
 }
 
 export type PolicyVariantRule = {
